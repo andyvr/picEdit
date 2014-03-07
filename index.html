@@ -13,22 +13,27 @@
 <div style="margin:10% auto 0 auto; display: table;">
 
 <div id="thebox" class="picedit_box">
-	<!-- Picedit navigation -->
+    <!-- Placeholder for messaging -->
+    <div class="picedit_message">
+    	 <span class="picedit_control ico-picedit-close" data-action="hide_messagebox"></span>
+        <div></div>
+    </div>
+    <!-- Picedit navigation -->
     <div class="picedit_nav_box picedit_gray_gradient">
     	<div class="picedit_pos_elements"></div>
        <div class="picedit_nav_elements">
        		 <!-- Picedit button element begin -->
             <div class="picedit_element">
-           	 <span class="picedit_control ico-picedit-redo" title="Rotate"></span>
+           	 <span class="picedit_control picedit_action ico-picedit-redo" title="Rotate"></span>
              	 <div class="picedit_control_menu">
                	<div class="picedit_control_menu_container picedit_tooltip picedit_elm_1">
                     <label>
                       <span>90&deg; CW</span>
-                      <span class="picedit_control ico-picedit-redo" data-action="rotate_cw"></span>
+                      <span class="picedit_control picedit_action ico-picedit-redo" data-action="rotate_cw"></span>
                     </label>
                     <label>
                       <span>90&deg; CCW</span>
-                      <span class="picedit_control ico-picedit-undo" data-action="rotate_ccw"></span>
+                      <span class="picedit_control picedit_action ico-picedit-undo" data-action="rotate_ccw"></span>
                     </label>
                   </div>
                </div>
@@ -36,12 +41,19 @@
            <!-- Picedit button element end -->
            <!-- Picedit button element begin -->
             <div class="picedit_element">
-           	 <span class="picedit_control ico-picedit-arrow-maximise" title="Resize"></span>
+           	 <span class="picedit_control picedit_action ico-picedit-arrow-maximise" title="Resize"></span>
              	 <div class="picedit_control_menu">
                	<div class="picedit_control_menu_container picedit_tooltip picedit_elm_2">
                     <label>
+						<span class="picedit_control picedit_action ico-picedit-checkmark" data-action="resize_image"></span>
+						<span class="picedit_control picedit_action ico-picedit-close" data-action=""></span>
+                    </label>
+                    <label>
                       <span>Width (px)</span>
                       <input type="text" class="picedit_input" data-variable="resize_width" value="0">
+                    </label>
+                    <label class="picedit_nomargin">
+                    	<span class="picedit_control ico-picedit-link" data-action="toggle_resize_proportions"></span>
                     </label>
                     <label>
                       <span>Height (px)</span>

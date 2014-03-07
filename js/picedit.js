@@ -21,12 +21,19 @@
     // Create the defaults once
     var pluginName = 'picEdit',
         defaults = {
-            propertyName: "value"
+			propertyName: "value",
+			maxWidth: 400,
+			maxHeight: 'auto',
+			aspectRatio: true
         };
 
     // The actual plugin constructor
     function Plugin( element, options ) {
         this.element = element;
+		
+		 // Save the reference to the messaging box
+		 this._messagebox = $(element).find(".picedit_message")[0];
+		 this._messagetimeout = false;
 
         // jQuery has an extend method which merges the contents of two or
         // more objects, storing the result in the first object. The first object
@@ -36,8 +43,15 @@
 
         this._defaults = defaults;
         this._name = pluginName;
-		
+		 // Reference to the loaded image
 		 this._image = false;
+		 // Interface variables (data synced from the user interface)
+		 this._variables = {};
+		 // Size of the viewport to display image (a resized image will be displayed)
+		 this._viewport = {
+			"width": 0,
+			"height": 0
+		 };
 
         this.init();
     }
@@ -76,29 +90,99 @@
 					};
 				});
 				this._bindControlButtons();
+				this._bindInputVariables();
+		},
+		// Remove all notification copy and hide message box
+		hide_messagebox: function () {
+			$(this._messagebox).removeClass("active no_close_button").children("div").html("");
+		},
+		// Open a loading spinner message box or working... message box
+		set_loading: function (message) {
+			if(message && message == 1) {
+				return this.set_messagebox("Working...", false, false);
+			}
+			else return this.set_messagebox("Loading...", false, false);
+		},
+		// Open message box alert with defined text autohide after number of milliseconds, display loading spinner
+		set_messagebox: function (text, autohide, closebutton) {
+			autohide = typeof autohide !== 'undefined' ? autohide : 2000;
+			closebutton = typeof closebutton !== 'undefined' ? closebutton : true;
+			var classes = "active";
+			if(!closebutton) classes += " no_close_button";
+			if(autohide) {
+				clearTimeout(this._messagetimeout);
+				var that = this;
+				this._messagetimeout = setTimeout(function(){ that.hide_messagebox(); }, autohide);
+			}
+			return $(this._messagebox).addClass(classes).children("div").html(text);
+		},
+		// Toggle resize proportions on or off
+		toggle_resize_proportions: function (elem) {
+			if($(elem).hasClass("active")) {
+				this._variables.resize_proportions = false;
+				$(elem).removeClass("active");
+			}
+			else {
+				this._variables.resize_proportions = true;
+				$(elem).addClass("active");
+			}
 		},
 		// Perform image load when user clicks on image button
 		load_image: function () {
 			this._fileinput.click();
 		},
-		// Rotate the image 90 degrees clockwise
-		rotate_cw: function () {
-			if(!this._image) return this._hideAllNav();
-			this._drawRotated(90);
-			this._resizeViewport();
-			// hide all opened navigation
-			this._hideAllNav();
-		},
 		// Rotate the image 90 degrees counter-clockwise
 		rotate_ccw: function () {
-			if(!this._image) return this._hideAllNav();
-			this._drawRotated(-90);
-			this._resizeViewport();
-			// hide all opened navigation
+			if(!this._image) return this._hideAllNav(1);
+			var that = this;
+			//run task and show loading spinner, the task can take some time to run
+			this.set_loading(1).delay(10).promise().done(function() {
+				that._doRotation(-90);
+				that._resizeViewport();
+				//hide loading spinner
+				that.hide_messagebox();
+			});
+			//hide all opened navigation
+			this._hideAllNav();
+		},
+		// Rotate the image 90 degrees clockwise
+		rotate_cw: function () {
+			if(!this._image) return this._hideAllNav(1);
+			var that = this;
+			//run task and show loading spinner, the task can take some time to run
+			this.set_loading(1).delay(10).promise().done(function() {
+				that._doRotation(90);
+				that._resizeViewport();
+				//hide loading spinner
+				that.hide_messagebox();
+			});
+			//hide all opened navigation
+			this._hideAllNav();
+		},
+		// Resize the image
+		resize_image: function () {
+			if(!this._image) return this._hideAllNav(1);
+			var that = this;
+			this.set_loading(1).delay(10).promise().done(function() {
+				//perform resize begin
+				var canvas = document.createElement('canvas');
+				var ctx = canvas.getContext("2d");
+				canvas.width = that._variables.resize_width;
+				canvas.height = that._variables.resize_height;
+				ctx.drawImage(that._image, 0, 0, canvas.width, canvas.height);
+				that._image.src = canvas.toDataURL("image/png");
+				that._paintCanvas();
+				//perform resize end
+				that._resizeViewport();
+				that.hide_messagebox();
+			});
 			this._hideAllNav();
 		},
 		// Hide all opened navigation and active buttons (clear plugin's box elements)
-		_hideAllNav: function () {
+		_hideAllNav: function (message) {
+			if(message && message == 1) {
+				this.set_messagebox("Open an image or use your camera to make a photo!");
+			}
 			$(this.element).find(".picedit_nav_box").removeClass("active").find(".picedit_element").removeClass("active");
 		},
 		// Paint image on canvas
@@ -109,7 +193,7 @@
 			$(this.element).find(".picedit_canvas").css("display", "block");
 		},
 		// Helper function to perform canvas rotation
-		_drawRotated: function (degrees){
+		_doRotation: function (degrees){
 			var rads=degrees*Math.PI/180;
 			//if rotation is 90 or 180 degrees try to adjust proportions
 			var newWidth, newHeight;
@@ -132,47 +216,45 @@
 			ctx.translate(cx, cy);
 			ctx.rotate(rads);
 			ctx.drawImage(this._image, -this._image.width/2, -this._image.height/2);
-			
-			
 			this._image.src = canvas.toDataURL("image/png");
 			this._paintCanvas();
 		},
 		// Resize the viewport (should be done on every image change)
 		_resizeViewport: function () {
-			var viewport = {
-				"maxwidth": $(this.element).css("max-width"),
-				"maxheight": $(this.element).css("max-height")
-			};
+			//get image reference
 			var img = this._image;
-			//calculate appropriate viewport size and resize the canvas
-			var bounds = {
-				"w": parseInt(viewport.maxwidth),
-				"h": parseInt(viewport.maxheight)
+			//set correct viewport width
+			var viewport = {
+				"width": img.width,
+				"height": img.height
 			};
-			if(viewport.maxwidth != "none" && viewport.maxheight != "none") {
-				//both width and height are constrained
+			if(this.options.maxWidth != 'auto' && img.width > this.options.maxWidth) viewport.width = this.options.maxWidth;
+			if(this.options.maxHeight != 'auto' && img.height > this.options.maxHeight) viewport.height = this.options.maxHeight;
+			//calculate appropriate viewport size and resize the canvas
+			if(this.options.aspectRatio) {
+				var resizeWidth = img.width;
+    			var resizeHeight = img.height;
+				var aspect = resizeWidth / resizeHeight;
+				if (resizeWidth > viewport.width) {
+				  viewport.width = parseInt(viewport.width);
+				  viewport.height = parseInt(viewport.width / aspect);
+				}
+				if (resizeHeight > viewport.height) {
+				  aspect = resizeWidth / resizeHeight;
+				  viewport.height = parseInt(viewport.height);
+				  viewport.width = parseInt(viewport.height * aspect);
+				}
 			}
-			else if(viewport.maxwidth != "none") {
-				//only width is constrained
-			}
-			else if(viewport.maxheight != "none") {
-				//only height is constrained
-			}
-			else {
-				//fit viewport to the size of image
-				viewport.width = img.width + "px";
-				viewport.height = img.height + "px";
-			}
-			//set the viewport size
+			//set the viewport size (resize the canvas)
 			$(this.element).css({
 				"width": viewport.width,
 				"height": viewport.height
 			});
 			//set the global viewport
-			this._viewport = {
-				"width": parseInt(viewport.width),
-				"height": parseInt(viewport.height)
-			};
+			this._viewport = viewport;
+			//update interface data (original image width and height)
+			this._setVariable("resize_width", img.width);
+			this._setVariable("resize_height", img.height);
 		},
 		// Bind click and action callbacks to all buttons with class: ".picedit_control"
 		_bindControlButtons: function() {
@@ -180,9 +262,11 @@
 			$(this.element).find(".picedit_control").bind( "click", function() {
 				// check to see if the element has a data-action attached to it
 				var action = $(this).data("action");
-				if(action) that[action](this);
+				if(action) {
+					that[action](this);
+				}
 				// handle click actions on top nav buttons
-				else {
+				else if($(this).hasClass("picedit_action")) {
 					$(this).parent(".picedit_element").toggleClass("active").siblings(".picedit_element").removeClass("active");
 					if($(this).parent(".picedit_element").hasClass("active")) 
 						$(this).closest(".picedit_nav_box").addClass("active");
@@ -190,6 +274,28 @@
 						$(this).closest(".picedit_nav_box").removeClass("active");
 				}
 			});
+		},
+		// Bind input elements to the application variables
+		_bindInputVariables: function() {
+			var that = this;
+			$(this.element).find(".picedit_input").bind( "change", function() {
+				// check to see if the element has a data-action attached to it
+				var variable = $(this).data("variable");
+				if(variable) {
+					var value = $(this).val();
+					that._variables[variable] = value;
+				}
+				if((variable == "resize_width" || variable == "resize_height") && that._variables.resize_proportions) {
+					var aspect = that._image.width / that._image.height;
+					if(variable == "resize_width") that._setVariable("resize_height", parseInt(value / aspect));
+					else that._setVariable("resize_width", parseInt(value * aspect));
+				}
+			});
+		},
+		// Set an interface variable and update the corresponding dom element (M-V binding)
+		_setVariable: function(variable, value) {
+			this._variables[variable] = value;
+			$(this.element).find('[data-variable="' + variable + '"]').val(value);
 		}
 	};
 

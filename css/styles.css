@@ -17,7 +17,16 @@
     opacity: 0;
 }
 .picedit_nav_box:hover, .picedit_nav_box.active {
-	opacity: 0.6;
+	opacity: 0.8;
+}
+.picedit_control {
+    padding: 0 0.25em;
+    cursor: pointer;
+    display: inline-block;
+    opacity: 0.8;
+}
+.picedit_control:hover, .picedit_element.active > .picedit_control, .picedit_control.active {
+	opacity: 1;
 }
 .picedit_gray_gradient {
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2QzZDNkMyIgc3RvcC1vcGFjaXR5PSIwLjY1Ii8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -47,15 +56,6 @@
 	z-index: 40;
 }
 .picedit_element > .picedit_control.ico-picedit-arrow-maximise {
-}
-.picedit_control {
-    padding: 0 0.25em;
-    cursor: pointer;
-    display: inline-block;
-    opacity: 0.6;
-}
-.picedit_control:hover, .picedit_element.active > .picedit_control {
-	opacity: 1;
 }
 .picedit_control_menu {
     display: none;
@@ -157,4 +157,39 @@
 }
 .picedit_action_btns > div:hover {
 	box-shadow: 0px 0px 3px #f0f0f0;
+}
+.picedit_nomargin {
+	margin: 0;
+}
+.picedit_message {
+    display: none;
+    position: absolute;
+    padding: 18px 30px 10px 10px;
+    bottom: 0;
+    border: 1px solid #eee;
+    margin-bottom: 3%;
+    margin-left: 3%;
+    z-index: 180;
+    background-color: #F7F5D4;
+    opacity: 0.8;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    border-radius: 4px 4px 4px 4px;
+    -webkit-box-shadow: 0 0 2px 1px #D8D8D8;
+    box-shadow: 0 0 2px 1px #D8D8D8;
+}
+.picedit_message.active {
+	display: block;
+}
+.picedit_message > span {
+    position: absolute;
+    top: 6px;
+    right: 5px;
+    z-index: 200;
+}
+.picedit_message.no_close_button > span {
+	display: none;
+}
+.picedit_message > div {
+    font-style: italic;
+    color: #888;
 }
