@@ -52,6 +52,17 @@
 			"width": 0,
 			"height": 0
 		 };
+		 // All variables responsible for cropping functionality
+		 this._cropping = {
+			 is_dragging: false,
+			 is_resizing: false,
+			 left: 0,
+			 top: 0,
+			 width: 0,
+			 height: 0,
+			 cropbox: $(element).find(".picedit_drag_resize")[0],
+			 cropframe: $(element).find(".picedit_drag_resize_box")[0]
+		 };
 
         this.init();
     }
@@ -91,6 +102,7 @@
 				});
 				this._bindControlButtons();
 				this._bindInputVariables();
+				this._bindSelectionDrag();
 		},
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
@@ -177,6 +189,54 @@
 				that.hide_messagebox();
 			});
 			this._hideAllNav();
+		},
+		crop_open: function () {
+			if(!this._image) return this._hideAllNav(1);
+			$(this._cropping.cropbox).addClass("active");
+			this._hideAllNav();
+		},
+		crop_close: function () {
+			$(this._cropping.cropbox).removeClass("active");
+		},
+		// Functions to controll cropping functionality (drag & resize cropping box)
+		_bindSelectionDrag: function() {
+			var that = this;
+			var eventbox = this._cropping.cropframe;
+			
+			var resizer = $(this._cropping.cropbox).find(".picedit_drag_resize_box_corner_wrap")[0];
+			$(window).on("mousedown", function(e) {
+				that._cropping.x = e.clientX;
+   				that._cropping.y = e.clientY;
+				that._cropping.w = eventbox.clientWidth;
+   				that._cropping.h = eventbox.clientHeight;
+				$(eventbox).on("mousemove", function(event) {
+					that._cropping.is_dragging = true;
+					if(!that._cropping.is_resizing) that._selection_drag_movement(event);
+				});
+				$(resizer).on("mousemove", function(event) {
+					event.stopPropagation();
+					that._cropping.is_resizing = true;
+					that._selection_resize_movement(event);
+				});
+			}).on("mouseup", function() {
+				if (!that._cropping.is_dragging) { /*was clicking*/ }
+				that._cropping.is_dragging = false;
+				that._cropping.is_resizing = false;
+				$(eventbox).off("mousemove");
+				$(resizer).off("mousemove");
+			});
+		},
+		_selection_resize_movement: function(e) {
+			var cropframe = this._cropping.cropframe;
+			cropframe.style.width = (this._cropping.w + e.clientX - this._cropping.x) + 'px';
+   			cropframe.style.height = (this._cropping.h + e.clientY - this._cropping.y) + 'px';
+		},
+		_selection_drag_movement: function(e) {
+			var cropframe = this._cropping.cropframe;
+			$(cropframe).offset({
+				top: e.pageY - parseInt(cropframe.clientHeight/2),
+				left: e.pageX - parseInt(cropframe.clientWidth/2)
+			});
 		},
 		// Hide all opened navigation and active buttons (clear plugin's box elements)
 		_hideAllNav: function (message) {
@@ -278,7 +338,7 @@
 		// Bind input elements to the application variables
 		_bindInputVariables: function() {
 			var that = this;
-			$(this.element).find(".picedit_input").bind( "change", function() {
+			$(this.element).find(".picedit_input").bind( "change keypress paste input", function() {
 				// check to see if the element has a data-action attached to it
 				var variable = $(this).data("variable");
 				if(variable) {

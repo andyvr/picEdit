@@ -22,7 +22,12 @@
     <div class="picedit_nav_box picedit_gray_gradient">
     	<div class="picedit_pos_elements"></div>
        <div class="picedit_nav_elements">
-       		 <!-- Picedit button element begin -->
+			<!-- Picedit button element begin -->
+			<div class="picedit_element">
+				<span class="picedit_control picedit_action ico-picedit-insertpicture" title="Crop" data-action="crop_open"></span>
+           </div>
+           <!-- Picedit button element end -->
+			 <!-- Picedit button element begin -->
             <div class="picedit_element">
            	 <span class="picedit_control picedit_action ico-picedit-redo" title="Rotate"></span>
              	 <div class="picedit_control_menu">
@@ -77,6 +82,19 @@
 			<canvas></canvas>
 		</div>
 	</div>
+    <!-- Picedit draggable and resizeable div to outline cropping boundaries -->
+    <div class="picedit_drag_resize">
+    	<div class="picedit_drag_resize_canvas"></div>
+		<div class="picedit_drag_resize_box">
+			<div class="picedit_drag_resize_box_corner_wrap">
+           	<div class="picedit_drag_resize_box_corner"></div>
+			</div>
+			<div class="picedit_drag_resize_box_elements">
+				<span class="picedit_control picedit_action ico-picedit-checkmark" data-action=""></span>
+				<span class="picedit_control picedit_action ico-picedit-close" data-action="crop_close"></span>
+			</div>
+       </div>
+    </div>
 </div>
 
 
