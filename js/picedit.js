@@ -78,7 +78,7 @@
 				//console.log("xD");
 				
 				// Save instance of this for inline functions
-				var that = this;
+				var _this = this;
 				// Get reference to the file input box
 				this._fileinput = $(this.element).find(".imageload")[0];
 				// Get reference to the canvas element
@@ -95,9 +95,9 @@
 					reader.readAsDataURL(file);
 					//wait till the data are loaded in
 					img.onload = function() {
-						that._image = img;
-						that._resizeViewport();
-						that._paintCanvas();
+						_this._image = img;
+						_this._resizeViewport();
+						_this._paintCanvas();
 					};
 				});
 				this._bindControlButtons();
@@ -123,8 +123,8 @@
 			if(!closebutton) classes += " no_close_button";
 			if(autohide) {
 				clearTimeout(this._messagetimeout);
-				var that = this;
-				this._messagetimeout = setTimeout(function(){ that.hide_messagebox(); }, autohide);
+				var _this = this;
+				this._messagetimeout = setTimeout(function(){ _this.hide_messagebox(); }, autohide);
 			}
 			return $(this._messagebox).addClass(classes).children("div").html(text);
 		},
@@ -146,13 +146,13 @@
 		// Rotate the image 90 degrees counter-clockwise
 		rotate_ccw: function () {
 			if(!this._image) return this._hideAllNav(1);
-			var that = this;
+			var _this = this;
 			//run task and show loading spinner, the task can take some time to run
 			this.set_loading(1).delay(10).promise().done(function() {
-				that._doRotation(-90);
-				that._resizeViewport();
+				_this._doRotation(-90);
+				_this._resizeViewport();
 				//hide loading spinner
-				that.hide_messagebox();
+				_this.hide_messagebox();
 			});
 			//hide all opened navigation
 			this._hideAllNav();
@@ -160,13 +160,13 @@
 		// Rotate the image 90 degrees clockwise
 		rotate_cw: function () {
 			if(!this._image) return this._hideAllNav(1);
-			var that = this;
+			var _this = this;
 			//run task and show loading spinner, the task can take some time to run
 			this.set_loading(1).delay(10).promise().done(function() {
-				that._doRotation(90);
-				that._resizeViewport();
+				_this._doRotation(90);
+				_this._resizeViewport();
 				//hide loading spinner
-				that.hide_messagebox();
+				_this.hide_messagebox();
 			});
 			//hide all opened navigation
 			this._hideAllNav();
@@ -174,21 +174,38 @@
 		// Resize the image
 		resize_image: function () {
 			if(!this._image) return this._hideAllNav(1);
-			var that = this;
+			var _this = this;
 			this.set_loading(1).delay(10).promise().done(function() {
 				//perform resize begin
 				var canvas = document.createElement('canvas');
 				var ctx = canvas.getContext("2d");
-				canvas.width = that._variables.resize_width;
-				canvas.height = that._variables.resize_height;
-				ctx.drawImage(that._image, 0, 0, canvas.width, canvas.height);
-				that._image.src = canvas.toDataURL("image/png");
-				that._paintCanvas();
+				canvas.width = _this._variables.resize_width;
+				canvas.height = _this._variables.resize_height;
+				ctx.drawImage(_this._image, 0, 0, canvas.width, canvas.height);
+				_this._image.src = canvas.toDataURL("image/png");
+				_this._paintCanvas();
 				//perform resize end
-				that._resizeViewport();
-				that.hide_messagebox();
+				_this._resizeViewport();
+				_this.hide_messagebox();
 			});
 			this._hideAllNav();
+		},
+		// Crop the image
+		crop_image: function() {
+			var crop = this._calculateCropWindow();
+			var _this = this;
+			this.set_loading(1).delay(10).promise().done(function() {
+				var canvas = document.createElement('canvas');
+				var ctx = canvas.getContext("2d");
+				canvas.width = crop.width;
+				canvas.height = crop.height;
+				ctx.drawImage(_this._image, crop.left, crop.top, crop.width, crop.height, 0, 0, crop.width, crop.height);
+				_this._image.src = canvas.toDataURL("image/png");
+				_this._paintCanvas();
+				_this._resizeViewport();
+				_this.hide_messagebox();
+			});
+			this.crop_close();
 		},
 		crop_open: function () {
 			if(!this._image) return this._hideAllNav(1);
@@ -200,28 +217,28 @@
 		},
 		// Functions to controll cropping functionality (drag & resize cropping box)
 		_bindSelectionDrag: function() {
-			var that = this;
+			var _this = this;
 			var eventbox = this._cropping.cropframe;
 			
 			var resizer = $(this._cropping.cropbox).find(".picedit_drag_resize_box_corner_wrap")[0];
 			$(window).on("mousedown", function(e) {
-				that._cropping.x = e.clientX;
-   				that._cropping.y = e.clientY;
-				that._cropping.w = eventbox.clientWidth;
-   				that._cropping.h = eventbox.clientHeight;
+				_this._cropping.x = e.clientX;
+   				_this._cropping.y = e.clientY;
+				_this._cropping.w = eventbox.clientWidth;
+   				_this._cropping.h = eventbox.clientHeight;
 				$(eventbox).on("mousemove", function(event) {
-					that._cropping.is_dragging = true;
-					if(!that._cropping.is_resizing) that._selection_drag_movement(event);
+					_this._cropping.is_dragging = true;
+					if(!_this._cropping.is_resizing) _this._selection_drag_movement(event);
 				});
 				$(resizer).on("mousemove", function(event) {
 					event.stopPropagation();
-					that._cropping.is_resizing = true;
-					that._selection_resize_movement(event);
+					_this._cropping.is_resizing = true;
+					_this._selection_resize_movement(event);
 				});
 			}).on("mouseup", function() {
-				if (!that._cropping.is_dragging) { /*was clicking*/ }
-				that._cropping.is_dragging = false;
-				that._cropping.is_resizing = false;
+				if (!_this._cropping.is_dragging) { /*was clicking*/ }
+				_this._cropping.is_dragging = false;
+				_this._cropping.is_resizing = false;
 				$(eventbox).off("mousemove");
 				$(resizer).off("mousemove");
 			});
@@ -234,8 +251,8 @@
 		_selection_drag_movement: function(e) {
 			var cropframe = this._cropping.cropframe;
 			$(cropframe).offset({
-				top: e.pageY - parseInt(cropframe.clientHeight/2),
-				left: e.pageX - parseInt(cropframe.clientWidth/2)
+				top: e.pageY - parseInt(cropframe.clientHeight / 2, 10),
+				left: e.pageX - parseInt(cropframe.clientWidth / 2, 10)
 			});
 		},
 		// Hide all opened navigation and active buttons (clear plugin's box elements)
@@ -252,6 +269,35 @@
 			this._ctx.drawImage(this._image, 0, 0, this._viewport.width, this._viewport.height);
 			$(this.element).find(".picedit_canvas").css("display", "block");
 		},
+		// Helper function to translate crop window size to the actual crop size
+		_calculateCropWindow: function (){
+			var view = this._viewport;		//viewport sizes
+			var real = {						//image real sizes
+				"width": this._image.width,
+				"height": this._image.height
+			};
+			var crop = {						//crop area sizes and position
+				"width": this._cropping.cropframe.clientWidth,
+				"height": this._cropping.cropframe.clientHeight,
+				"top": (this._cropping.cropframe.offsetTop > 0) ? this._cropping.cropframe.offsetTop : 0.1,
+				"left": (this._cropping.cropframe.offsetLeft > 0) ? this._cropping.cropframe.offsetLeft : 0.1
+			};
+			if((crop.width + crop.left) > view.width) crop.width = view.width - crop.left;
+			if((crop.height + crop.top) > view.height) crop.height = view.height - crop.top;
+			//calculate width and height for the full image size
+			var width_percent = crop.width / view.width;
+			var height_percent = crop.height / view.height;
+			var area = {
+				"width": parseInt(real.width * width_percent, 10),
+				"height": parseInt(real.height * height_percent, 10)
+			};
+			//calculate actual top and left crop position
+			var top_percent = crop.top / view.height;
+			var left_percent = crop.left / view.width;
+			area.top = parseInt(real.height * top_percent, 10);
+			area.left = parseInt(real.width * left_percent, 10);
+			return area;
+		},
 		// Helper function to perform canvas rotation
 		_doRotation: function (degrees){
 			var rads=degrees*Math.PI/180;
@@ -266,8 +312,8 @@
 			//create temporary canvas and context
 			var canvas = document.createElement('canvas');
 			var ctx = canvas.getContext("2d");
-			canvas.width = parseInt(newWidth);
-			canvas.height = parseInt(newHeight);
+			canvas.width = parseInt(newWidth, 10);
+			canvas.height = parseInt(newHeight, 10);
 			// calculate the centerpoint of the canvas
 			var cx=canvas.width/2;
 			var cy=canvas.height/2;
@@ -275,7 +321,7 @@
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.translate(cx, cy);
 			ctx.rotate(rads);
-			ctx.drawImage(this._image, -this._image.width/2, -this._image.height/2);
+			ctx.drawImage(this._image, -this._image.width / 2, -this._image.height / 2);
 			this._image.src = canvas.toDataURL("image/png");
 			this._paintCanvas();
 		},
@@ -296,13 +342,13 @@
     			var resizeHeight = img.height;
 				var aspect = resizeWidth / resizeHeight;
 				if (resizeWidth > viewport.width) {
-				  viewport.width = parseInt(viewport.width);
-				  viewport.height = parseInt(viewport.width / aspect);
+				  viewport.width = parseInt(viewport.width, 10);
+				  viewport.height = parseInt(viewport.width / aspect, 10);
 				}
 				if (resizeHeight > viewport.height) {
 				  aspect = resizeWidth / resizeHeight;
-				  viewport.height = parseInt(viewport.height);
-				  viewport.width = parseInt(viewport.height * aspect);
+				  viewport.height = parseInt(viewport.height, 10);
+				  viewport.width = parseInt(viewport.height * aspect, 10);
 				}
 			}
 			//set the viewport size (resize the canvas)
@@ -318,12 +364,12 @@
 		},
 		// Bind click and action callbacks to all buttons with class: ".picedit_control"
 		_bindControlButtons: function() {
-			var that = this;
+			var _this = this;
 			$(this.element).find(".picedit_control").bind( "click", function() {
 				// check to see if the element has a data-action attached to it
 				var action = $(this).data("action");
 				if(action) {
-					that[action](this);
+					_this[action](this);
 				}
 				// handle click actions on top nav buttons
 				else if($(this).hasClass("picedit_action")) {
@@ -337,18 +383,18 @@
 		},
 		// Bind input elements to the application variables
 		_bindInputVariables: function() {
-			var that = this;
+			var _this = this;
 			$(this.element).find(".picedit_input").bind( "change keypress paste input", function() {
 				// check to see if the element has a data-action attached to it
 				var variable = $(this).data("variable");
 				if(variable) {
 					var value = $(this).val();
-					that._variables[variable] = value;
+					_this._variables[variable] = value;
 				}
-				if((variable == "resize_width" || variable == "resize_height") && that._variables.resize_proportions) {
-					var aspect = that._image.width / that._image.height;
-					if(variable == "resize_width") that._setVariable("resize_height", parseInt(value / aspect));
-					else that._setVariable("resize_width", parseInt(value * aspect));
+				if((variable == "resize_width" || variable == "resize_height") && _this._variables.resize_proportions) {
+					var aspect = _this._image.width / _this._image.height;
+					if(variable == "resize_width") _this._setVariable("resize_height", parseInt(value / aspect, 10));
+					else _this._setVariable("resize_width", parseInt(value * aspect, 10));
 				}
 			});
 		},
