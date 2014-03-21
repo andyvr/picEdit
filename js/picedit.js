@@ -30,10 +30,6 @@
     // The actual plugin constructor
     function Plugin( element, options ) {
         this.element = element;
-		
-		 // Save the reference to the messaging box
-		 this._messagebox = $(element).find(".picedit_message")[0];
-		 this._messagetimeout = false;
 
         // jQuery has an extend method which merges the contents of two or
         // more objects, storing the result in the first object. The first object
@@ -47,22 +43,6 @@
 		 this._image = false;
 		 // Interface variables (data synced from the user interface)
 		 this._variables = {};
-		 // Size of the viewport to display image (a resized image will be displayed)
-		 this._viewport = {
-			"width": 0,
-			"height": 0
-		 };
-		 // All variables responsible for cropping functionality
-		 this._cropping = {
-			 is_dragging: false,
-			 is_resizing: false,
-			 left: 0,
-			 top: 0,
-			 width: 0,
-			 height: 0,
-			 cropbox: $(element).find(".picedit_drag_resize")[0],
-			 cropframe: $(element).find(".picedit_drag_resize_box")[0]
-		 };
 
         this.init();
     }
@@ -85,6 +65,29 @@
 				this._canvas = $(this.element).find("canvas")[0];
 				// Create and set the 2d context for the canvas
 				this._ctx = this._canvas.getContext("2d");
+				// Reference to video elemment holder element
+				this._videobox = $(this.element).find(".picedit_video")[0];
+				// Reference to the painter element
+				this._painter = $(this.element).find(".picedit_painter")[0];
+				// Save the reference to the messaging box
+		 		this._messagebox = $(this.element).find(".picedit_message")[0];
+		 		this._messagetimeout = false;
+				// Size of the viewport to display image (a resized image will be displayed)
+				 this._viewport = {
+					"width": 0,
+					"height": 0
+				 };
+				 // All variables responsible for cropping functionality
+				 this._cropping = {
+					 is_dragging: false,
+					 is_resizing: false,
+					 left: 0,
+					 top: 0,
+					 width: 0,
+					 height: 0,
+					 cropbox: $(this.element).find(".picedit_drag_resize")[0],
+					 cropframe: $(this.element).find(".picedit_drag_resize_box")[0]
+				 };
 				// Bind onchange event to the fileinput to pre-process the image selected
 				$(this._fileinput).on( "change", function() {
 					var file = this.files[0];
@@ -103,6 +106,10 @@
 				this._bindControlButtons();
 				this._bindInputVariables();
 				this._bindSelectionDrag();
+				// Set Default interface variable values
+				this._variables.pen_color = "black";
+				this._variables.pen_size = false;
+				this._variables.prev_pos = false;
 		},
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
@@ -128,20 +135,43 @@
 			}
 			return $(this._messagebox).addClass(classes).children("div").html(text);
 		},
-		// Toggle resize proportions on or off
-		toggle_resize_proportions: function (elem) {
+		// Toggle button and update variables
+		toggle_button: function (elem) {
 			if($(elem).hasClass("active")) {
-				this._variables.resize_proportions = false;
+				value = false;
 				$(elem).removeClass("active");
 			}
 			else {
-				this._variables.resize_proportions = true;
+				value = true;
+				$(elem).siblings().removeClass("active");
 				$(elem).addClass("active");
 			}
+			var variable = $(elem).data("variable");
+			if(variable) {
+				var optional_value = $(elem).data("value");
+				if(!optional_value) optional_value = $(elem).val();
+				if(optional_value && value) value = optional_value;
+				this._setVariable(variable, value);
+			}
+			if(this._variables.pen_color && this._variables.pen_size) this.pen_tool_open();
+			else this.pen_tool_close();
 		},
 		// Perform image load when user clicks on image button
 		load_image: function () {
 			this._fileinput.click();
+		},
+		// Open pen tool and start drawing
+		pen_tool_open: function () {
+			this._ctx.lineJoin = "round";
+			this._ctx.lineCap = "round";
+			this._ctx.strokeStyle = this._variables.pen_color;
+      		this._ctx.lineWidth = this._variables.pen_size;
+			$(this._painter).addClass("active");
+			this._hideAllNav();
+		},
+		// Close pen tool
+		pen_tool_close: function () {
+			$(this._painter).removeClass("active");
 		},
 		// Rotate the image 90 degrees counter-clockwise
 		rotate_ccw: function () {
@@ -183,12 +213,55 @@
 				canvas.height = _this._variables.resize_height;
 				ctx.drawImage(_this._image, 0, 0, canvas.width, canvas.height);
 				_this._image.src = canvas.toDataURL("image/png");
-				_this._paintCanvas();
-				//perform resize end
 				_this._resizeViewport();
+				_this._paintCanvas();
 				_this.hide_messagebox();
 			});
 			this._hideAllNav();
+		},
+		// Open video element and start capturing live video from camera to later make a photo
+		camera_open: function() {
+			var getUserMedia;
+			var browserUserMedia = navigator.webkitGetUserMedia	||	// WebKit
+									 navigator.mozGetUserMedia	||	// Mozilla FireFox
+									 navigator.getUserMedia;			// 2013...
+			if ( !browserUserMedia ) return this.set_messagebox("Sorry, your browser doesn't support WebRTC!");
+			var _this = this;
+			getUserMedia = browserUserMedia.bind( navigator );
+			getUserMedia({
+					audio: false,
+					video: true
+				},
+				function( stream ) {
+					var videoElement = $(_this._videobox).find("video")[0];
+					//var videoElement = document.getElementById( 'video' );
+					videoElement.src = URL.createObjectURL( stream );
+					$(_this._videobox).addClass("active");
+				},
+				function( err ) {
+					return _this.set_messagebox("No video source detected! Please allow camera access!");
+				}
+			);
+		},
+		camera_close: function() {
+			$(this._videobox).removeClass("active");
+		},
+		take_photo: function() {
+			var _this = this;
+			var live = $(this._videobox).find("video")[0];
+			var canvas = document.createElement('canvas');
+			var ctx = canvas.getContext("2d");
+			canvas.width = live.clientWidth;
+			canvas.height = live.clientHeight;
+			ctx.drawImage(live, 0, 0, canvas.width, canvas.height);
+			var img = document.createElement("img");
+			img.src = canvas.toDataURL("image/png");
+			img.onload = function() {
+				_this._image = img;
+				$(_this._videobox).removeClass("active");
+				_this._resizeViewport();
+				_this._paintCanvas();
+			};
 		},
 		// Crop the image
 		crop_image: function() {
@@ -201,8 +274,8 @@
 				canvas.height = crop.height;
 				ctx.drawImage(_this._image, crop.left, crop.top, crop.width, crop.height, 0, 0, crop.width, crop.height);
 				_this._image.src = canvas.toDataURL("image/png");
-				_this._paintCanvas();
 				_this._resizeViewport();
+				_this._paintCanvas();
 				_this.hide_messagebox();
 			});
 			this.crop_close();
@@ -221,6 +294,7 @@
 			var eventbox = this._cropping.cropframe;
 			
 			var resizer = $(this._cropping.cropbox).find(".picedit_drag_resize_box_corner_wrap")[0];
+			var painter = this._painter;
 			$(window).on("mousedown", function(e) {
 				_this._cropping.x = e.clientX;
    				_this._cropping.y = e.clientY;
@@ -235,12 +309,18 @@
 					_this._cropping.is_resizing = true;
 					_this._selection_resize_movement(event);
 				});
+				$(painter).on("mousemove", function(event) {
+					event.stopPropagation();
+					_this._painter_movement(event);
+				});
 			}).on("mouseup", function() {
 				if (!_this._cropping.is_dragging) { /*was clicking*/ }
 				_this._cropping.is_dragging = false;
 				_this._cropping.is_resizing = false;
+				_this._variables.prev_pos = false;
 				$(eventbox).off("mousemove");
 				$(resizer).off("mousemove");
+				$(painter).off("mousemove");
 			});
 		},
 		_selection_resize_movement: function(e) {
@@ -254,6 +334,19 @@
 				top: e.pageY - parseInt(cropframe.clientHeight / 2, 10),
 				left: e.pageX - parseInt(cropframe.clientWidth / 2, 10)
 			});
+		},
+		_painter_movement: function(e) {
+			var pos = {};
+			pos.x = e.offsetX;
+			pos.y = e.offsetY;
+			if(!this._variables.prev_pos) {
+				return this._variables.prev_pos = pos;
+			}
+			this._ctx.beginPath();
+    		this._ctx.moveTo(this._variables.prev_pos.x, this._variables.prev_pos.y);
+    		this._ctx.lineTo(pos.x, pos.y);
+    		this._ctx.stroke();
+			this._variables.prev_pos = pos;
 		},
 		// Hide all opened navigation and active buttons (clear plugin's box elements)
 		_hideAllNav: function (message) {

@@ -3,9 +3,10 @@
     position: relative;
     border: 1px solid #ddd;
 	font-family: "Myriad Pro", Arial, Helvetica, sans-serif;
-	font-size: 0.8em;
+	font-size: 1rem;
     width: 400px;
     height: 200px;
+    color: #aaa;
 }
 .picedit_nav_box {
     position: absolute;
@@ -27,6 +28,8 @@
 }
 .picedit_control:hover, .picedit_element.active > .picedit_control, .picedit_control.active {
 	opacity: 1;
+	text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8), 0 0 0 rgba(0, 0, 0, 0.75), 1px 1px 5px #FFF;
+	color: transparent;
 }
 .picedit_gray_gradient {
 	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2QzZDNkMyIgc3RvcC1vcGFjaXR5PSIwLjY1Ii8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
@@ -80,16 +83,18 @@
     left: 70%;
 }
 .picedit_tooltip.picedit_elm_2:after, .picedit_tooltip.picedit_elm_2:before {
-    left: 95%;
+    left: 96%;
 }
-.picedit_tooltip.picedit_elm_3:after, .picedit_tooltip.picedit_elm_3:before {}
+.picedit_tooltip.picedit_elm_3:after, .picedit_tooltip.picedit_elm_3:before {
+    left: 12%;
+}
 .picedit_tooltip {
 	position: relative;
 	background: #ffffff;
 	border: 1px solid #cccccc;
 	padding: 2% 1%;
-	-webkit-box-shadow: 0px 0px 2px 1px #dddddd;
-	box-shadow: 0px 0px 2px 1px #dddddd;
+	-webkit-box-shadow: 0em 0em 0.2em 0.1em #dddddd;
+	box-shadow: 0em 0em 0.2em 0.1em #dddddd;
 	white-space: nowrap;
 }
 .picedit_tooltip:after, .picedit_tooltip:before {
@@ -106,14 +111,14 @@
 .picedit_tooltip:after {
 	border-color: rgba(255, 255, 255, 0);
 	border-bottom-color: #ffffff;
-	border-width: 7px;
-	margin-left: -7px;
+	border-width: 8px;
+	margin-left: -8px;
 }
 .picedit_tooltip:before {
 	border-color: rgba(204, 204, 204, 0);
 	border-bottom-color: #cccccc;
-	border-width: 8px;
-	margin-left: -8px;
+	border-width: 9px;
+	margin-left: -9px;
 }
 .picedit_input {
     width: 3em;
@@ -156,7 +161,7 @@
 	display: none;
 }
 .picedit_action_btns > div:hover {
-	box-shadow: 0px 0px 3px #f0f0f0;
+	box-shadow: 0em 0em 0.4em #f0f0f0;
 }
 .picedit_nomargin {
 	margin: 0;
@@ -164,7 +169,7 @@
 .picedit_message {
     display: none;
     position: absolute;
-    padding: 18px 30px 10px 10px;
+    padding: 2em 3em 1em 1em;
     bottom: 0;
     border: 1px solid #eee;
     margin-bottom: 3%;
@@ -175,15 +180,15 @@
     -webkit-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
     -webkit-box-shadow: 0 0 2px 1px #D8D8D8;
-    box-shadow: 0 0 2px 1px #D8D8D8;
+    box-shadow: 0 0 0.3em 0.2em #D8D8D8;
 }
 .picedit_message.active {
 	display: block;
 }
 .picedit_message > span {
     position: absolute;
-    top: 6px;
-    right: 5px;
+    top: 0.6em;
+    right: 0.5em;
     z-index: 200;
 }
 .picedit_message.no_close_button > span {
@@ -223,15 +228,15 @@
 }
 .picedit_drag_resize_box_corner_wrap {
     position: absolute;
-    bottom: -15px;
-    right: -15px;
-    padding: 15px;
+    bottom: -1.5em;
+    right: -1.5em;
+    padding: 1.5em;
 }
 .picedit_drag_resize_box_corner {
     width: 0px;
     height: 0px;
     border-style: solid;
-    border-width: 0 0 12px 12px;
+    border-width: 0 0 1.2em 1.2em;
     border-color: transparent transparent #ddd transparent;
     opacity: 0.8;
     z-index: 40;
@@ -241,4 +246,98 @@
     position: absolute;
     bottom: 0;
     left: 0;
+}
+.picedit_colors span {
+    width: 1.2em;
+    height: 1.2em;
+    border: 1px solid #757575;
+    padding: 0;
+    vertical-align: middle;
+    margin: 0.1em;
+    opacity: 0.3;
+}
+.picedit_black {
+    background-color: black;
+}
+.picedit_red {
+    background-color: red;
+}
+.picedit_green {
+    background-color: green;
+}
+.picedit_sizes span {
+    padding: 0;
+    border-radius: 50%;
+    background-color: #aaa;
+    vertical-align: middle;
+    margin: 0.2em;
+}
+.picedit_large {
+    width: 1.2em;
+    height: 1.2em;
+}
+.picedit_medium {
+    width: 0.8em;
+    height: 0.8em;
+}
+.picedit_small {
+    width: 0.3em;
+    height: 0.3em;
+}
+.picedit_elm_3 {
+    display: table;
+}
+.picedit_elm_3 > label {
+    display: table-cell;
+    padding-bottom: 0.1em;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+.picedit_video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+    display: none;
+}
+.picedit_video.active {
+    display: block;
+}
+.picedit_video video {
+    width: 100%;
+    height: auto;
+}
+.picedit_video_controls {
+    position: absolute;
+    bottom: 0.5em;
+    width: 100%;
+    text-align: center;
+}
+.picedit_video_controls span {
+    font-size: 1.5em;
+    border: 1px solid #bbb;
+    padding: 0.3em;
+    border-radius: 50%;
+    color: #ccc;
+    margin: 0 0.4em;
+    vertical-align: -webkit-baseline-middle;
+}
+.picedit_sizes span.active {
+    background-color: #111;
+    border: 1px solid #757575;
+}
+.picedit_painter {
+    display: none;
+    position: absolute;
+    z-index: 12;
+    left: 0;
+    cursor: default;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+.picedit_painter.active {
+    display: block;
 }
