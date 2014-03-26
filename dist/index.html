@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Untitled Document</title>
+
+<link rel="stylesheet" type="text/css" href="css/font.css" />
+<link rel="stylesheet" type="text/css" href="css/styles.css" />
+
+</head>
+<body>
+
+<div style="margin:10% auto 0 auto; display: table;">
+
+<form action="" method="post" enctype="multipart/form-data" id="xid">
+
+<input type="file" name="thefile" id="thebox">
+
+<button type="submit">s</button>
+
+</form>
+
+</div>
+
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/picedit.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('#thebox').picEdit();
+	});
+</script>
+
+</body>
+</html>

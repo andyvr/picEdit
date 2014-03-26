@@ -29,7 +29,8 @@
 
     // The actual plugin constructor
     function Plugin( element, options ) {
-        this.element = element;
+        this.inputelement = element;
+		 this.element = element;
 
         // jQuery has an extend method which merges the contents of two or
         // more objects, storing the result in the first object. The first object
@@ -43,7 +44,11 @@
 		 this._image = false;
 		 // Interface variables (data synced from the user interface)
 		 this._variables = {};
-
+		 
+		 // Prepare the template
+		 //this._template();
+		 
+		 // Init should be removed from here when template is generated
         this.init();
     }
 
@@ -55,12 +60,11 @@
 				// and this.settings
 				// you can add more functions like the one below and
 				// call them like so: this.yourOtherFunction(this.element, this.settings).
-				//console.log("xD");
 				
 				// Save instance of this for inline functions
 				var _this = this;
 				// Get reference to the file input box
-				this._fileinput = $(this.element).find(".imageload")[0];
+				this._fileinput = $('<input type="file" accept="image/*">');
 				// Get reference to the canvas element
 				this._canvas = $(this.element).find("canvas")[0];
 				// Create and set the 2d context for the canvas
@@ -101,8 +105,14 @@
 						_this._image = img;
 						_this._resizeViewport();
 						_this._paintCanvas();
+						_this._updateInput();
 					};
 				});
+				// Define formdata element
+				this._theformdata = false;
+				if(!window.FormData) this.set_messagebox("Sorry, the FormData API is not supported!");
+				else this._theformdata = new FormData($(this.inputelement).parents("form")[0]);
+				// Call helper functions
 				this._bindControlButtons();
 				this._bindInputVariables();
 				this._bindSelectionDrag();
@@ -215,6 +225,7 @@
 				_this._image.src = canvas.toDataURL("image/png");
 				_this._resizeViewport();
 				_this._paintCanvas();
+				_this._updateInput();
 				_this.hide_messagebox();
 			});
 			this._hideAllNav();
@@ -261,6 +272,7 @@
 				$(_this._videobox).removeClass("active");
 				_this._resizeViewport();
 				_this._paintCanvas();
+				_this._updateInput();
 			};
 		},
 		// Crop the image
@@ -276,6 +288,7 @@
 				_this._image.src = canvas.toDataURL("image/png");
 				_this._resizeViewport();
 				_this._paintCanvas();
+				_this._updateInput();
 				_this.hide_messagebox();
 			});
 			this.crop_close();
@@ -417,6 +430,7 @@
 			ctx.drawImage(this._image, -this._image.width / 2, -this._image.height / 2);
 			this._image.src = canvas.toDataURL("image/png");
 			this._paintCanvas();
+			this._updateInput();
 		},
 		// Resize the viewport (should be done on every image change)
 		_resizeViewport: function () {
@@ -495,6 +509,21 @@
 		_setVariable: function(variable, value) {
 			this._variables[variable] = value;
 			$(this.element).find('[data-variable="' + variable + '"]').val(value);
+		},
+		// update file input element with the modified image file info
+		_updateInput: function() {
+			if(!this._theformdata) return this.set_messagebox("Sorry, the FormData API is not supported!");
+			var inputname = $(this.inputelement).prop("name");
+			this._theformdata.append(inputname, this._image);
+		},
+		// Prepare the template here
+		_template: function() {
+			var template = '<div>html markup</div>';
+			var _this = this;
+			$(this.inputelement).hide().after(template).each(function() {
+				_this.element = $(_this.inputelement).next(".picedit_box");
+				_this.init();
+			});
 		}
 	};
 
