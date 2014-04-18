@@ -30,7 +30,7 @@
     // The actual plugin constructor
     function Plugin( element, options ) {
         this.inputelement = element;
-		 this.element = false;
+		 this.element = element;
 
         // jQuery has an extend method which merges the contents of two or
         // more objects, storing the result in the first object. The first object
@@ -45,11 +45,14 @@
 		 // Interface variables (data synced from the user interface)
 		 this._variables = {};
 		 
-		 // Prepare the template
-		 this._template();
+		 /* Prepare the template */
+		 /*unhide_in_prod*/
+		  this._template(); 
+		 /*unhide_in_prod*/
 		 
-		 // Init should be removed from here when template is generated
-        //this.init();
+		 /*hide_in_prod*/ /* 
+        this.init();
+		 */ /*hide_in_prod*/
     }
 
 	Plugin.prototype = {
@@ -93,7 +96,7 @@
 					 cropframe: $(this.element).find(".picedit_drag_resize_box")[0]
 				 };
 				// Bind onchange event to the fileinput to pre-process the image selected
-				$(this._fileinput).on( "change", function() {
+				$(this._fileinput).on("change", function() {
 					var file = this.files[0];
 					var img = document.createElement("img");
 					img.file = file;
@@ -108,12 +111,32 @@
 						_this._updateInput();
 					};
 				});
+				// Bind onpaste event to capture images from the the clipboard
+				$(document).on("paste", function(event) {
+					var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+					var blob;
+					for (var i = 0; i < items.length; i++) {
+					  if (items[i].type.indexOf("image") === 0) {
+						blob = items[i].getAsFile();
+					  }
+					}
+					if (blob) {
+					  var img = document.createElement("img");
+					  var reader = new FileReader();
+					  reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+					  reader.readAsDataURL(blob);
+					  img.onload = function() {
+						  _this._image = img;
+						  _this._resizeViewport();
+						  _this._paintCanvas();
+						  _this._updateInput();
+					  };
+					}
+				});
 				// Define formdata element
 				this._theformdata = false;
 				if(!window.FormData) this.set_messagebox("Sorry, the FormData API is not supported!");
 				else this._theformdata = new FormData($(this.inputelement).parents("form")[0]);
-				var x = $(this.inputelement).parents("form")[0];
-				var xid = new FormData(document.getElementById("xid"));
 				// Call helper functions
 				this._bindControlButtons();
 				this._bindInputVariables();
@@ -517,11 +540,10 @@
 			if(!this._theformdata) return this.set_messagebox("Sorry, the FormData API is not supported!");
 			var inputname = $(this.inputelement).prop("name");
 			this._theformdata.append(inputname, this._image);
-			this._theformdata.append("CustomField", "This is some extra data");
 		},
 		// Prepare the template here
 		_template: function() {
-			var template = '<div id="thebox" class="picedit_box"><div class="picedit_message"><span class="picedit_control ico-picedit-close" data-action="hide_messagebox"></span><div></div></div><div class="picedit_nav_box picedit_gray_gradient"><div class="picedit_pos_elements"></div><div class="picedit_nav_elements"><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-pencil" title="Pen Tool"></span><div class="picedit_control_menu"><div class="picedit_control_menu_container picedit_tooltip picedit_elm_3"><label class="picedit_colors"><span title="Black" class="picedit_control picedit_action picedit_black active" data-action="toggle_button" data-variable="pen_color" data-value="black"></span><span title="Red" class="picedit_control picedit_action picedit_red" data-action="toggle_button" data-variable="pen_color" data-value="red"></span><span title="Green" class="picedit_control picedit_action picedit_green" data-action="toggle_button" data-variable="pen_color" data-value="green"></span></label><label><span class="picedit_separator"></span></label><label class="picedit_sizes"><span title="Large" class="picedit_control picedit_action picedit_large" data-action="toggle_button" data-variable="pen_size" data-value="16"></span><span title="Medium" class="picedit_control picedit_action picedit_medium" data-action="toggle_button" data-variable="pen_size" data-value="8"></span><span title="Small" class="picedit_control picedit_action picedit_small" data-action="toggle_button" data-variable="pen_size" data-value="3"></span></label></div></div></div><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-insertpicture" title="Crop" data-action="crop_open"></span></div><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-redo" title="Rotate"></span><div class="picedit_control_menu"><div class="picedit_control_menu_container picedit_tooltip picedit_elm_1"><label><span>90&deg;CW</span><span class="picedit_control picedit_action ico-picedit-redo" data-action="rotate_cw"></span></label><label><span>90&deg;CCW</span><span class="picedit_control picedit_action ico-picedit-undo" data-action="rotate_ccw"></span></label></div></div></div><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-arrow-maximise" title="Resize"></span><div class="picedit_control_menu"><div class="picedit_control_menu_container picedit_tooltip picedit_elm_2"><label><span class="picedit_control picedit_action ico-picedit-checkmark" data-action="resize_image"></span><span class="picedit_control picedit_action ico-picedit-close" data-action=""></span></label><label><span>Width (px)</span><input type="text" class="picedit_input" data-variable="resize_width" value="0"></label><label class="picedit_nomargin"><span class="picedit_control ico-picedit-link" data-action="toggle_button" data-variable="resize_proportions"></span></label><label><span>Height (px)</span><input type="text" class="picedit_input" data-variable="resize_height" value="0"></label></div></div></div></div></div><div class="picedit_canvas_box"><div class="picedit_action_btns"><div class="picedit_control ico-picedit-picture" data-action="load_image"></div><div class="picedit_control ico-picedit-camera" data-action="camera_open"></div></div><div class="picedit_canvas"><canvas></canvas></div><div class="picedit_painter"></div></div><div class="picedit_video"><video autoplay></video><div class="picedit_video_controls"><span class="picedit_control picedit_action ico-picedit-checkmark" data-action="take_photo"></span><span class="picedit_control picedit_action ico-picedit-close" data-action="camera_close"></span></div></div><div class="picedit_drag_resize"><div class="picedit_drag_resize_canvas"></div><div class="picedit_drag_resize_box"><div class="picedit_drag_resize_box_corner_wrap"><div class="picedit_drag_resize_box_corner"></div></div><div class="picedit_drag_resize_box_elements"><span class="picedit_control picedit_action ico-picedit-checkmark" data-action="crop_image"></span><span class="picedit_control picedit_action ico-picedit-close" data-action="crop_close"></span></div></div></div></div>';
+			var template = '<div class="picedit_box"><div class="picedit_message"><span class="picedit_control ico-picedit-close" data-action="hide_messagebox"></span><div></div></div><div class="picedit_nav_box picedit_gray_gradient"><div class="picedit_pos_elements"></div><div class="picedit_nav_elements"><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-pencil" title="Pen Tool"></span><div class="picedit_control_menu"><div class="picedit_control_menu_container picedit_tooltip picedit_elm_3"><label class="picedit_colors"><span title="Black" class="picedit_control picedit_action picedit_black active" data-action="toggle_button" data-variable="pen_color" data-value="black"></span><span title="Red" class="picedit_control picedit_action picedit_red" data-action="toggle_button" data-variable="pen_color" data-value="red"></span><span title="Green" class="picedit_control picedit_action picedit_green" data-action="toggle_button" data-variable="pen_color" data-value="green"></span></label><label><span class="picedit_separator"></span></label><label class="picedit_sizes"><span title="Large" class="picedit_control picedit_action picedit_large" data-action="toggle_button" data-variable="pen_size" data-value="16"></span><span title="Medium" class="picedit_control picedit_action picedit_medium" data-action="toggle_button" data-variable="pen_size" data-value="8"></span><span title="Small" class="picedit_control picedit_action picedit_small" data-action="toggle_button" data-variable="pen_size" data-value="3"></span></label></div></div></div><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-insertpicture" title="Crop" data-action="crop_open"></span></div><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-redo" title="Rotate"></span><div class="picedit_control_menu"><div class="picedit_control_menu_container picedit_tooltip picedit_elm_1"><label><span>90° CW</span><span class="picedit_control picedit_action ico-picedit-redo" data-action="rotate_cw"></span></label><label><span>90° CCW</span><span class="picedit_control picedit_action ico-picedit-undo" data-action="rotate_ccw"></span></label></div></div></div><div class="picedit_element"><span class="picedit_control picedit_action ico-picedit-arrow-maximise" title="Resize"></span><div class="picedit_control_menu"><div class="picedit_control_menu_container picedit_tooltip picedit_elm_2"><label><span class="picedit_control picedit_action ico-picedit-checkmark" data-action="resize_image"></span><span class="picedit_control picedit_action ico-picedit-close" data-action=""></span></label><label><span>Width (px)</span><input type="text" class="picedit_input" data-variable="resize_width" value="0"></label><label class="picedit_nomargin"><span class="picedit_control ico-picedit-link" data-action="toggle_button" data-variable="resize_proportions"></span></label><label><span>Height (px)</span><input type="text" class="picedit_input" data-variable="resize_height" value="0"></label></div></div></div></div></div><div class="picedit_canvas_box"><div class="picedit_action_btns"><div class="picedit_control ico-picedit-picture" data-action="load_image"></div><div class="picedit_control ico-picedit-camera" data-action="camera_open"></div><div class="center">or copy/paste image here</div></div><div class="picedit_canvas"><canvas></canvas></div><div class="picedit_painter"></div></div><div class="picedit_video"><video autoplay></video><div class="picedit_video_controls"><span class="picedit_control picedit_action ico-picedit-checkmark" data-action="take_photo"></span><span class="picedit_control picedit_action ico-picedit-close" data-action="camera_close"></span></div></div><div class="picedit_drag_resize"><div class="picedit_drag_resize_canvas"></div><div class="picedit_drag_resize_box"><div class="picedit_drag_resize_box_corner_wrap"><div class="picedit_drag_resize_box_corner"></div></div><div class="picedit_drag_resize_box_elements"><span class="picedit_control picedit_action ico-picedit-checkmark" data-action="crop_image"></span><span class="picedit_control picedit_action ico-picedit-close" data-action="crop_close"></span></div></div></div></div>';
 			var _this = this;
 			$(this.inputelement).hide().after(template).each(function() {
 				_this.element = $(_this.inputelement).next(".picedit_box");

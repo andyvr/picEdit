@@ -142,6 +142,20 @@
 .picedit_canvas_box:hover .picedit_action_btns {
 	z-index: 12;
 }
+.picedit_action_btns .center {
+    text-align: center;
+    font-size: 0.3em;
+    color: #CACACA;
+    position: absolute;
+    bottom: -0.5em;
+    left: 0;
+    width: 100%;
+    height: auto;
+    font-style: italic;
+}
+.picedit_action_btns .center:hover {
+	box-shadow: none;
+}
 .picedit_action_btns {
 	font-size: 3em;
 	color: #eeeeee;

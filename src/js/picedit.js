@@ -45,11 +45,14 @@
 		 // Interface variables (data synced from the user interface)
 		 this._variables = {};
 		 
-		 // Prepare the template
-		 //this._template();
+		 /* Prepare the template */
+		 /*unhide_in_prod*/
+		 /*this._template();*/
+		 /*unhide_in_prod*/
 		 
-		 // Init should be removed from here when template is generated
+		 /*hide_in_prod*/
         this.init();
+		/*hide_in_prod*/
     }
 
 	Plugin.prototype = {
@@ -93,7 +96,7 @@
 					 cropframe: $(this.element).find(".picedit_drag_resize_box")[0]
 				 };
 				// Bind onchange event to the fileinput to pre-process the image selected
-				$(this._fileinput).on( "change", function() {
+				$(this._fileinput).on("change", function() {
 					var file = this.files[0];
 					var img = document.createElement("img");
 					img.file = file;
@@ -107,6 +110,28 @@
 						_this._paintCanvas();
 						_this._updateInput();
 					};
+				});
+				// Bind onpaste event to capture images from the the clipboard
+				$(document).on("paste", function(event) {
+					var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+					var blob;
+					for (var i = 0; i < items.length; i++) {
+					  if (items[i].type.indexOf("image") === 0) {
+						blob = items[i].getAsFile();
+					  }
+					}
+					if (blob) {
+					  var img = document.createElement("img");
+					  var reader = new FileReader();
+					  reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+					  reader.readAsDataURL(blob);
+					  img.onload = function() {
+						  _this._image = img;
+						  _this._resizeViewport();
+						  _this._paintCanvas();
+						  _this._updateInput();
+					  };
+					}
 				});
 				// Define formdata element
 				this._theformdata = false;
@@ -518,7 +543,7 @@
 		},
 		// Prepare the template here
 		_template: function() {
-			var template = '<div>html markup</div>';
+			var template = 'compiled_template_markup';
 			var _this = this;
 			$(this.inputelement).hide().after(template).each(function() {
 				_this.element = $(_this.inputelement).next(".picedit_box");

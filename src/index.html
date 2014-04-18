@@ -12,7 +12,8 @@
 
 <div style="margin:10% auto 0 auto; display: table;">
 
-<div id="thebox" class="picedit_box">
+<!-- begin_picedit_box -->
+<div class="picedit_box">
     <!-- Placeholder for messaging -->
     <div class="picedit_message">
     	 <span class="picedit_control ico-picedit-close" data-action="hide_messagebox"></span>
@@ -55,11 +56,11 @@
              	 <div class="picedit_control_menu">
                	<div class="picedit_control_menu_container picedit_tooltip picedit_elm_1">
                     <label>
-                      <span>90&deg; CW</span>
+                      <span>90° CW</span>
                       <span class="picedit_control picedit_action ico-picedit-redo" data-action="rotate_cw"></span>
                     </label>
                     <label>
-                      <span>90&deg; CCW</span>
+                      <span>90° CCW</span>
                       <span class="picedit_control picedit_action ico-picedit-undo" data-action="rotate_ccw"></span>
                     </label>
                   </div>
@@ -97,6 +98,7 @@
 		<div class="picedit_action_btns">
         	<div class="picedit_control ico-picedit-picture" data-action="load_image"></div>
 			<div class="picedit_control ico-picedit-camera" data-action="camera_open"></div>
+			<div class="center">or copy/paste image here</div>
 		</div>
 		<div class="picedit_canvas">
 			<canvas></canvas>
@@ -125,6 +127,7 @@
        </div>
     </div>
 </div>
+<!-- end_picedit_box -->
 
 
 </div>
@@ -133,7 +136,7 @@
 <script type="text/javascript" src="js/picedit.js"></script>
 <script type="text/javascript">
 	$(function() {
-		$('#thebox').picEdit();
+		$('.picedit_box').picEdit();
 	});
 </script>
 
