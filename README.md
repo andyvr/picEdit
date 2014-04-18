@@ -1,7 +1,7 @@
 picEdit
 =======
 
-*This plugin is work in progress!* The plugin will turn your form's file-input box into a tiny image editor. Perform basic image operations and preview your image before uploading to the server.
+*This plugin is work in progress!* The plugin will turn your form's file-input box into a tiny image editor. Perform basic image operations and preview your image before uploading to the server. The functionality for the plugin is very similar to the one found in http://pasteboard.co
 
 So, your good old html form with the file upload field to upload an image:
 <p align="center">
