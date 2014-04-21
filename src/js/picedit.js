@@ -98,39 +98,52 @@
 				// Bind onchange event to the fileinput to pre-process the image selected
 				$(this._fileinput).on("change", function() {
 					var file = this.files[0];
-					var img = document.createElement("img");
-					img.file = file;
 					var reader = new FileReader();
-					reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-					reader.readAsDataURL(file);
-					//wait till the data are loaded in
-					img.onload = function() {
-						_this._image = img;
-						_this._resizeViewport();
-						_this._paintCanvas();
-						_this._updateInput();
+					reader.onload = function(e) { 
+						_this._create_image_with_datasrc(e.target.result, false, file); 
 					};
+					reader.readAsDataURL(file);
 				});
+				// If Firefox (doesn't support clipboard object), create DIV to catch pasted image
+				if (!window.Clipboard) { // Firefox
+					var pasteCatcher = $(document.createElement("div"));
+					pasteCatcher.attr("contenteditable","true").css({
+						"position" : "absolute", 
+						"left" : "-999",
+						"width" : "0",
+						"height" : "0",
+						"overflow" : "hidden",
+						"outline" : 0
+					});
+					$(document.body).prepend(pasteCatcher);
+				}
 				// Bind onpaste event to capture images from the the clipboard
 				$(document).on("paste", function(event) {
 					var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
 					var blob;
-					for (var i = 0; i < items.length; i++) {
-					  if (items[i].type.indexOf("image") === 0) {
-						blob = items[i].getAsFile();
-					  }
+					if(!items) {
+						pasteCatcher.get(0).focus();
+						setTimeout(function(){
+							var child = pasteCatcher.children().last().get(0);
+							pasteCatcher.html("");
+							if (child) {
+								if (child.tagName === "IMG" && child.src.substr(0, 5) == 'data:') {
+									_this._create_image_with_datasrc(child.src);
+								}
+							}
+						}, 600);
 					}
-					if (blob) {
-					  var img = document.createElement("img");
-					  var reader = new FileReader();
-					  reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-					  reader.readAsDataURL(blob);
-					  img.onload = function() {
-						  _this._image = img;
-						  _this._resizeViewport();
-						  _this._paintCanvas();
-						  _this._updateInput();
-					  };
+					else {
+						for (var i = 0; i < items.length; i++) {
+						  if (items[i].type.indexOf("image") === 0) {
+							blob = items[i].getAsFile();
+						  }
+						}
+						if(blob) {
+						  var reader = new FileReader();
+						  reader.onload = function(e) { _this._create_image_with_datasrc(e.target.result); };
+						  reader.readAsDataURL(blob);
+						}
 					}
 				});
 				// Define formdata element
@@ -290,15 +303,9 @@
 			canvas.width = live.clientWidth;
 			canvas.height = live.clientHeight;
 			ctx.drawImage(live, 0, 0, canvas.width, canvas.height);
-			var img = document.createElement("img");
-			img.src = canvas.toDataURL("image/png");
-			img.onload = function() {
-				_this._image = img;
+			this._create_image_with_datasrc(canvas.toDataURL("image/png"), function() {
 				$(_this._videobox).removeClass("active");
-				_this._resizeViewport();
-				_this._paintCanvas();
-				_this._updateInput();
-			};
+			});
 		},
 		// Crop the image
 		crop_image: function() {
@@ -325,6 +332,20 @@
 		},
 		crop_close: function () {
 			$(this._cropping.cropbox).removeClass("active");
+		},
+		// Create and update image from datasrc
+		_create_image_with_datasrc: function(datasrc, callback, file) {
+			var _this = this;
+			var img = document.createElement("img");
+			if(file) img.file = file;
+			img.src = datasrc;
+			img.onload = function() {
+				_this._image = img;
+				_this._resizeViewport();
+				_this._paintCanvas();
+				_this._updateInput();
+				if(callback && typeof(callback) == "function") callback();
+			};
 		},
 		// Functions to controll cropping functionality (drag & resize cropping box)
 		_bindSelectionDrag: function() {
