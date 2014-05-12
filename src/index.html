@@ -10,6 +10,9 @@
 </head>
 <body>
 
+<form name="testform" action="out.php" method="post" enctype="multipart/form-data">
+<input type="hidden" value="test value" name="testinput">
+
 <div style="margin:10% auto 0 auto; display: table;">
 
 <!-- begin_picedit_box -->
@@ -95,15 +98,17 @@
 	</div>
 	<!-- Picedit canvas element -->
 	<div class="picedit_canvas_box">
+		<div class="picedit_canvas">
+			<canvas></canvas>
+		</div>
+		<div class="picedit_painter">
+			<canvas></canvas>
+		</div>
 		<div class="picedit_action_btns">
         	<div class="picedit_control ico-picedit-picture" data-action="load_image"></div>
 			<div class="picedit_control ico-picedit-camera" data-action="camera_open"></div>
 			<div class="center">or copy/paste image here</div>
 		</div>
-		<div class="picedit_canvas">
-			<canvas></canvas>
-		</div>
-		<div class="picedit_painter"></div>
 	</div>
 	<!-- Picedit Video Box -->
 	<div class="picedit_video">
@@ -132,11 +137,23 @@
 
 </div>
 
+<div style="margin-top:30px; text-align: center;">
+    <button type="submit">Submit</button>
+</div>
+
+</form>
+
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript" src="js/picedit.js"></script>
 <script type="text/javascript">
 	$(function() {
-		$('.picedit_box').picEdit();
+		$('.picedit_box').picEdit({
+			imageUpdated: function(img){
+			},
+			formSubmitted: function(){
+			},
+			redirectUrl: false,
+		});
 	});
 </script>
 
