@@ -1,9 +1,11 @@
 picEdit
 =======
 
-*This plugin is work in progress!* The plugin will turn your form's file-input box into a tiny image editor. Perform basic image operations and preview your image before uploading to the server. The functionality for the plugin is very similar to the one found in pasteboard.co
+*This plugin is work in progress! Don't use it in production!* 
 
-So, your good old html form with the file upload field to upload an image:
+The plugin will turn your form's ```<input type="file"...``` box into a tiny image editor. Perform basic image operations and preview your image before uploading to the server. The functionality for the plugin is very similar to the one introduced in pasteboard.co website.
+
+In other words, your good old html form with the file upload field, like this:
 <p align="center">
 <img src="../../raw/gh-pages/img/img1.gif" />
 </p>
@@ -12,15 +14,82 @@ will change to something more user-friendly:
 <img src="../../raw/gh-pages/img/img2.gif" />
 </p>
 
-The plugin supports 3 sources for image data:<br>
-1. You can drag-and-drop your image on the widget or search your computer for images<br>
-2. You can use your computer/tablet web-camera to make a photo<br>
-3. You can copy and paste the image
+**This plugin allows you to receive images from 3 different sources:**
 
-The plugin supports image rotation, cropping, resizing and pen tool.
-Once you're done with the image manipulations you can just upload your form as usual, the updated image will be uploaded along with the form, as if it would be the regular file-upload field.
+1. You can search your computer for images by clicking on the image button in the center of the plugin, it will behave just like a regular file input field, you can also drag-and-drop your image on to the widget (work only in browsers that support drag and drop api)
+2. You can use your computer/tablet web-camera to make a photo by clicking on the camera button in the center of the plugin (work only in browsers that support WebRTC)
+3. You can copy and paste the image from the clipboard (work only in browsers that support clipboard api)
+
+The plugin allows to perform image rotations, cropping, resizing and pen tool.
+Once you're done with the image manipulations you can just upload the form as usual, the updated image will be uploaded along with the form as the a part of the form.
 
 See the demo here: http://andyvr.github.io/picEdit/
+###Available methods and options
+
+**maxWidth**
+
+_type: int/auto, default: 400_ - max width for the picedit element (the image will not be re-scaled if it's wider, this parameter controls image preview only)
+
+**maxHeight**
+
+_type: int/auto, default: auto_ - max height for the picedit element (same as with maxWidth parameter)
+
+**redirectUrl**
+
+_type: string/bool, default: false_ - the form redirect url. When defined will redirect the user to the specified url.
+
+**imageUpdated**
+
+_type: func_ - the callback function to be called every time the image is updated. Takes image object as the first parameter.
+```
+$('#image').picEdit({
+  imageUpdated: function(img){
+     alert('Image updated!');
+  }
+});
+```
+
+**formSubmitted**
+
+_type: func_ - the callback function to be called once the form is submitted to the server. Takes no parameters.
+```
+$('#image').picEdit({
+  formSubmitted: function(){
+     alert('Form submitted!');
+  }
+});
+```
+
+
+###Usage Example
+
+**Include jquery, the plugin js and css files**
+
+```
+<link rel="stylesheet" type="text/css" href="dist/css/styles.min.css" />
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="dist/js/picedit.min.js"></script>
+```
+
+**Create a form in your html with the file upload input box (ex.:)**
+
+```
+<form action="upload.php" method="post">
+	Name: <input type="text" name="name">
+	Image: <input type="file" name="image" id="image">
+	<button type="submit">Submit</button>
+</form>
+```
+
+**Bind the plugin to the file upload input box, that's it!**
+
+```
+<script type="text/javascript">
+	$(function() {
+		$('#image').picEdit();
+	});
+</script>
+```
 
 <p align="center">
 <img src="../../raw/gh-pages/img/img1.jpg" />
