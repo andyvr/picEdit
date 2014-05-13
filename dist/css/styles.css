@@ -102,6 +102,14 @@
     width: 400px;
     height: 200px;
     color: #aaa;
+    overflow: hidden;
+}
+.picedit_canvas_box:hover .picedit_action_btns, .picedit_action_btns.active {
+	z-index: 8;
+	opacity: 0.6;
+}
+.picedit_canvas_box.dragging {
+    box-shadow: 0px 0px 6px #555;
 }
 .picedit_nav_box {
     position: absolute;
@@ -111,6 +119,12 @@
     padding: 1% 1% 1.5% 1%;
     z-index: 15;
     opacity: 0;
+	
+	-webkit-transition: opacity 200ms ease-out;
+	-moz-transition: opacity 200ms ease-out;
+	-ms-transition: opacity 200ms ease-out;
+	-o-transition: opacity 200ms ease-out;
+	transition: opacity 200ms ease-out;
 }
 .picedit_nav_box:hover, .picedit_nav_box.active {
 	opacity: 0.8;
@@ -121,6 +135,11 @@
     display: inline-block;
     opacity: 1;
     vertical-align: middle;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
 .picedit_control:hover, .picedit_element.active > .picedit_control, .picedit_control.active {
 	opacity: 1;
@@ -156,13 +175,24 @@
 .picedit_element > .picedit_control.ico-picedit-arrow-maximise {
 }
 .picedit_control_menu {
-    display: none;
+    display: inline-block;
     position: absolute;
     top: 1.3em;
     right: 1%;
     z-index: 30;
     padding-top: 1.3em;
     width: auto;
+    opacity: 0;
+	-moz-transform: scaleY(0);
+	-webkit-transform: scaleY(0);
+	-o-transform: scaleY(0);
+	-ms-transform: scaleY(0);
+	transform: scaleY(0);
+	-webkit-transition: all 200ms ease-out;
+	-moz-transition: all 200ms ease-out;
+	-ms-transition: all 200ms ease-out;
+	-o-transition: all 200ms ease-out;
+	transition: all 200ms ease-out;
 }
 .picedit_control_menu label {
     display: inline-block;
@@ -171,7 +201,12 @@
 .picedit_control_menu label > span {
 }
 /*.picedit_element:hover .picedit_control_menu, */.picedit_element.active .picedit_control_menu {
-    display: inline-block;
+    opacity: 1;
+	-moz-transform: scaleY(1);
+	-webkit-transform: scaleY(1);
+	-o-transform: scaleY(1);
+	-ms-transform: scaleY(1);
+	transform: scaleY(1);
 }
 .picedit_control_menu_container {
 }
@@ -234,10 +269,7 @@
 	width: 100%;
 	height: 100%;
 	display: none;
-	z-index: 10;
-}
-.picedit_canvas_box:hover .picedit_action_btns {
-	z-index: 12;
+	z-index: 5;
 }
 .picedit_action_btns .center {
     text-align: center;
@@ -256,13 +288,20 @@
 }
 .picedit_action_btns {
 	font-size: 3em;
-	color: #EEEEEE;
+	color: #ddd;
 	width: 60%;
 	height: 50%;
 	display: inline-table;
 	margin: 12% auto 0% auto;
 	position: relative;
-	z-index: 5;
+	opacity: 0;
+	
+	z-index: 4;
+	-webkit-transition: all 200ms ease-in-out;
+	-moz-transition: all 200ms ease-in-out;
+	-ms-transition: all 200ms ease-in-out;
+	-o-transition: all 200ms ease-in-out;
+	transition: all 200ms ease-in-out;
 }
 .picedit_action_btns > div {
     display: table-cell;
@@ -278,11 +317,10 @@
 .picedit_nomargin {
 	margin: 0;
 }
-.picedit_message {
-    display: none; 
+.picedit_message { 
     position: absolute;
     padding: 1.4em 2.5em 1em 1em;
-    bottom: 0;
+    bottom: -100px;
     border: 1px solid #eee;
     margin-bottom: 3%;
     margin-left: 3%;
@@ -294,9 +332,15 @@
     border-radius: 4px 4px 4px 4px;
     -webkit-box-shadow: 0 0 2px 1px #D8D8D8;
     box-shadow: 0 0 0.3em 0.2em #D8D8D8;
+	
+	-webkit-transition: bottom 200ms ease-out;
+	-moz-transition: bottom 200ms ease-out;
+	-ms-transition: bottom 200ms ease-out;
+	-o-transition: bottom 200ms ease-out;
+	transition: bottom 200ms ease-out;
 }
 .picedit_message.active {
-	display: block;
+	bottom: 0;
 }
 .picedit_message > span {
     position: absolute;
@@ -446,7 +490,7 @@
 .picedit_painter {
     display: none;
     position: absolute;
-    z-index: 12;
+    z-index: 3;
     left: 0;
     cursor: crosshair;
     top: 0;
@@ -455,7 +499,8 @@
 }
 .picedit_painter.active {
     display: block;
+    z-index: 12;
 }
-.picedit_painter.active ~ .picedit_action_btns {
-    z-index: 5;
+.picedit_painter.active + .picedit_canvas {
+    z-index: 10;
 }

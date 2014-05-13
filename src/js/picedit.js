@@ -86,6 +86,8 @@
 				// Save the reference to the messaging box
 		 		this._messagebox = $(this.element).find(".picedit_message");
 		 		this._messagetimeout = false;
+				// Reference to the main buttons holder
+				this._mainbuttons = $(this.element).find(".picedit_action_btns");
 				// Size of the viewport to display image (a resized image will be displayed)
 				 this._viewport = {
 					"width": 0,
@@ -102,9 +104,9 @@
 					 cropbox: $(this.element).find(".picedit_drag_resize"),
 					 cropframe: $(this.element).find(".picedit_drag_resize_box")
 				 };
-				// Bind onchange event to the fileinput to pre-process the image selected
-				$(this._fileinput).on("change", function() {
-					var file = this.files[0];
+				 function build_img_from_file(files) {
+					if(!files && !files.length) return;
+					var file = files[0];
 					if(!_this._filename) {
 						_this._filename = file.name;
 					}
@@ -113,6 +115,23 @@
 						_this._create_image_with_datasrc(e.target.result, false, file); 
 					};
 					reader.readAsDataURL(file);
+				 }
+				// Bind file drag-n-drop behavior
+				$(this.element).find(".picedit_canvas_box").on("drop", function(event) {
+					event.preventDefault();
+					$(this).removeClass('dragging');
+					var files = (event.dataTransfer || event.originalEvent.dataTransfer).files;
+					build_img_from_file(files);
+				}).on("dragover", function(event) {
+					event.preventDefault();
+					$(this).addClass('dragging');
+				}).on("dragleave", function(event) {
+					event.preventDefault();
+					$(this).removeClass('dragging');
+				});
+				// Bind onchange event to the fileinput to pre-process the image selected
+				$(this._fileinput).on("change", function() {
+					build_img_from_file(this.files);
 				});
 				// If Firefox (doesn't support clipboard object), create DIV to catch pasted image
 				if (!window.Clipboard) { // Firefox
@@ -174,7 +193,9 @@
 		},
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
-			this._messagebox.removeClass("active no_close_button").children("div").html("");
+			var msgbox = this._messagebox;
+			msgbox.removeClass("active no_close_button");
+			setTimeout(function() {msgbox.children("div").html("")}, 200);
 		},
 		// Open a loading spinner message box or working... message box
 		set_loading: function (message) {
@@ -379,6 +400,7 @@
 				_this._resizeViewport();
 				_this._paintCanvas();
 				_this.options.imageUpdated(_this._image);
+				_this._mainbuttons.removeClass("active");
 				if(callback && typeof(callback) == "function") callback();
 			};
 		},
