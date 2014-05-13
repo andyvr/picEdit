@@ -456,8 +456,10 @@
 		},
 		_painter_movement: function(e) {
 			var pos = {};
-			pos.x = e.offsetX;
-			pos.y = e.offsetY;
+			var target = e.target || e.srcElement,
+			rect = target.getBoundingClientRect();
+			pos.x = e.clientX - rect.left;
+			pos.y = e.clientY - rect.top;
 			if(!this._variables.prev_pos) {
 				return this._variables.prev_pos = pos;
 			}
