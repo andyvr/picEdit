@@ -637,11 +637,13 @@
 			else {
 				var _this = this;
 				this._theformdata = new FormData(this._theform[0]);
-				var inputname = $(this.inputelement).prop("name") || "file";
-				var inputblob = this._dataURItoBlob(this._image.src);
-				if(!this._filename) this._filename = inputblob.type.replace("/", ".");
-				else this._filename = this._filename.match(/^[^\.]*/) + "." + inputblob.type.match(/[^\/]*$/);
-				this._theformdata.append(inputname, inputblob, this._filename);
+				if(this._image) {
+					var inputname = $(this.inputelement).prop("name") || "file";
+					var inputblob = this._dataURItoBlob(this._image.src);
+					if(!this._filename) this._filename = inputblob.type.replace("/", ".");
+					else this._filename = this._filename.match(/^[^\.]*/) + "." + inputblob.type.match(/[^\/]*$/);
+					this._theformdata.append(inputname, inputblob, this._filename);
+				}
 				//send request
 				var request = new XMLHttpRequest();
 				request.open(this._theform.prop("method"), this._theform.prop("action"));
