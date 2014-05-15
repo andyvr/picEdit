@@ -161,7 +161,7 @@
 									_this._create_image_with_datasrc(child.src);
 								}
 							}
-						}, 600);
+						}, 800);
 					}
 					else {
 						for (var i = 0; i < items.length; i++) {
@@ -202,7 +202,7 @@
 			if(message && message == 1) {
 				return this.set_messagebox("Working...", false, false);
 			}
-			else return this.set_messagebox("Loading...", false, false);
+			else return this.set_messagebox("Please Wait...", false, false);
 		},
 		// Open message box alert with defined text autohide after number of milliseconds, display loading spinner
 		set_messagebox: function (text, autohide, closebutton) {
@@ -268,7 +268,7 @@
 			if(!this._image) return this._hideAllNav(1);
 			var _this = this;
 			//run task and show loading spinner, the task can take some time to run
-			this.set_loading(1).delay(10).promise().done(function() {
+			this.set_loading(1).delay(200).promise().done(function() {
 				_this._doRotation(-90);
 				_this._resizeViewport();
 				//hide loading spinner
@@ -282,7 +282,7 @@
 			if(!this._image) return this._hideAllNav(1);
 			var _this = this;
 			//run task and show loading spinner, the task can take some time to run
-			this.set_loading(1).delay(10).promise().done(function() {
+			this.set_loading(1).delay(200).promise().done(function() {
 				_this._doRotation(90);
 				_this._resizeViewport();
 				//hide loading spinner
@@ -295,7 +295,7 @@
 		resize_image: function () {
 			if(!this._image) return this._hideAllNav(1);
 			var _this = this;
-			this.set_loading(1).delay(10).promise().done(function() {
+			this.set_loading(1).delay(200).promise().done(function() {
 				//perform resize begin
 				var canvas = document.createElement('canvas');
 				var ctx = canvas.getContext("2d");
@@ -305,11 +305,6 @@
 				_this._create_image_with_datasrc(canvas.toDataURL("image/png"), function() {
 					_this.hide_messagebox();
 				});
-				/*_this._image.src = canvas.toDataURL("image/png");
-				_this._resizeViewport();
-				_this._paintCanvas();
-				_this.options.imageUpdated(_this._image);
-				_this.hide_messagebox();*/
 			});
 			this._hideAllNav();
 		},
@@ -364,7 +359,7 @@
 		crop_image: function() {
 			var crop = this._calculateCropWindow();
 			var _this = this;
-			this.set_loading(1).delay(10).promise().done(function() {
+			this.set_loading(1).delay(200).promise().done(function() {
 				var canvas = document.createElement('canvas');
 				var ctx = canvas.getContext("2d");
 				canvas.width = crop.width;
@@ -477,9 +472,19 @@
 			canvas.height = this._image.height;
 			ctx.drawImage(this._image, 0, 0, canvas.width, canvas.height);
 			ctx.drawImage(this._painter_canvas, 0, 0, canvas.width, canvas.height);
-			this._create_image_with_datasrc(canvas.toDataURL("image/png"), function() {
-				_this.pen_tool_params_set();
-			});
+			if(canvas.width > 1280 && canvas.height > 800) {
+				this.set_loading().delay(200).promise().done(function() {
+					_this._create_image_with_datasrc(canvas.toDataURL("image/png"), function() {
+						_this.pen_tool_params_set();
+						_this.hide_messagebox();
+					});
+				});
+			}
+			else {
+				this._create_image_with_datasrc(canvas.toDataURL("image/png"), function() {
+					_this.pen_tool_params_set();
+				});
+			}
 		},
 		// Hide all opened navigation and active buttons (clear plugin's box elements)
 		_hideAllNav: function (message) {
@@ -636,24 +641,26 @@
 			if(!window.FormData) this.set_messagebox("Sorry, the FormData API is not supported!");
 			else {
 				var _this = this;
-				this._theformdata = new FormData(this._theform[0]);
-				if(this._image) {
-					var inputname = $(this.inputelement).prop("name") || "file";
-					var inputblob = this._dataURItoBlob(this._image.src);
-					if(!this._filename) this._filename = inputblob.type.replace("/", ".");
-					else this._filename = this._filename.match(/^[^\.]*/) + "." + inputblob.type.match(/[^\/]*$/);
-					this._theformdata.append(inputname, inputblob, this._filename);
-				}
-				//send request
-				var request = new XMLHttpRequest();
-				request.open(this._theform.prop("method"), this._theform.prop("action"));
-				request.onload = function(e) {
-					if(_this.options.redirectUrl === true) window.location.reload();
-					else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
-					else _this.set_messagebox("Data successfully submitted!");
-					_this.options.formSubmitted();
-				};
-				request.send(this._theformdata);
+				this.set_loading().delay(200).promise().done(function() {
+					_this._theformdata = new FormData(_this._theform[0]);
+					if(_this._image) {
+						var inputname = $(_this.inputelement).prop("name") || "file";
+						var inputblob = _this._dataURItoBlob(_this._image.src);
+						if(!_this._filename) _this._filename = inputblob.type.replace("/", ".");
+						else _this._filename = _this._filename.match(/^[^\.]*/) + "." + inputblob.type.match(/[^\/]*$/);
+						_this._theformdata.append(inputname, inputblob, _this._filename);
+					}
+					//send request
+					var request = new XMLHttpRequest();
+					request.open(_this._theform.prop("method"), _this._theform.prop("action"));
+					request.onload = function(e) {
+						if(_this.options.redirectUrl === true) window.location.reload();
+						else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
+						else _this.set_messagebox("Data successfully submitted!");
+						_this.options.formSubmitted();
+					};
+					request.send(_this._theformdata);
+				});
 			}
 			return false;
 		},
