@@ -405,26 +405,26 @@
 			var eventbox = this._cropping.cropframe;
 			var painter = this._painter;
 			var resizer = this._cropping.cropbox.find(".picedit_drag_resize_box_corner_wrap");
-			$(window).on("mousedown", function(e) {
+			$(window).on("mousedown touchstart", function(e) {
 				_this._cropping.x = e.clientX;
    				_this._cropping.y = e.clientY;
 				_this._cropping.w = eventbox[0].clientWidth;
    				_this._cropping.h = eventbox[0].clientHeight;
-				eventbox.on("mousemove", function(event) {
+				eventbox.on("mousemove touchmove", function(event) {
 					_this._cropping.is_dragging = true;
 					if(!_this._cropping.is_resizing) _this._selection_drag_movement(event);
 				});
-				resizer.on("mousemove", function(event) {
+				resizer.on("mousemove touchmove", function(event) {
 					event.stopPropagation();
 					_this._cropping.is_resizing = true;
 					_this._selection_resize_movement(event);
 				});
-				painter.on("mousemove", function(event) {
+				painter.on("mousemove touchmove", function(event) {
 					event.stopPropagation();
 					_this._painter_painting = true;
 					_this._painter_movement(event);
 				});
-			}).on("mouseup", function() {
+			}).on("mouseup touchend", function() {
 				if (_this._painter_painting) {
 					_this._painter_merge_drawing();
 				}
@@ -432,9 +432,9 @@
 				_this._cropping.is_resizing = false;
 				_this._painter_painting = false;
 				_this._variables.prev_pos = false;
-				eventbox.off("mousemove");
-				resizer.off("mousemove");
-				painter.off("mousemove");
+				eventbox.off("mousemove touchmove");
+				resizer.off("mousemove touchmove");
+				painter.off("mousemove touchmove");
 			});
 		},
 		_selection_resize_movement: function(e) {
