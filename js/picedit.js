@@ -406,21 +406,26 @@
 			var painter = this._painter;
 			var resizer = this._cropping.cropbox.find(".picedit_drag_resize_box_corner_wrap");
 			$(window).on("mousedown touchstart", function(e) {
-				_this._cropping.x = e.clientX;
-   				_this._cropping.y = e.clientY;
+				var evtpos = (e.clientX) ? e : e.originalEvent.touches[0];
+				_this._cropping.x = evtpos.clientX;
+   				_this._cropping.y = evtpos.clientY;
 				_this._cropping.w = eventbox[0].clientWidth;
    				_this._cropping.h = eventbox[0].clientHeight;
 				eventbox.on("mousemove touchmove", function(event) {
+					event.stopPropagation();
+        			event.preventDefault();
 					_this._cropping.is_dragging = true;
 					if(!_this._cropping.is_resizing) _this._selection_drag_movement(event);
 				});
 				resizer.on("mousemove touchmove", function(event) {
 					event.stopPropagation();
+        			event.preventDefault();
 					_this._cropping.is_resizing = true;
 					_this._selection_resize_movement(event);
 				});
 				painter.on("mousemove touchmove", function(event) {
 					event.stopPropagation();
+        			event.preventDefault();
 					_this._painter_painting = true;
 					_this._painter_movement(event);
 				});
@@ -439,22 +444,25 @@
 		},
 		_selection_resize_movement: function(e) {
 			var cropframe = this._cropping.cropframe[0];
-			cropframe.style.width = (this._cropping.w + e.clientX - this._cropping.x) + 'px';
-   			cropframe.style.height = (this._cropping.h + e.clientY - this._cropping.y) + 'px';
+			var evtpos = (e.clientX) ? e : e.originalEvent.touches[0];
+			cropframe.style.width = (this._cropping.w + evtpos.clientX - this._cropping.x) + 'px';
+   			cropframe.style.height = (this._cropping.h + evtpos.clientY - this._cropping.y) + 'px';
 		},
 		_selection_drag_movement: function(e) {
 			var cropframe = this._cropping.cropframe[0];
+			var evtpos = (e.pageX) ? e : e.originalEvent.touches[0];
 			this._cropping.cropframe.offset({
-				top: e.pageY - parseInt(cropframe.clientHeight / 2, 10),
-				left: e.pageX - parseInt(cropframe.clientWidth / 2, 10)
+				top: evtpos.pageY - parseInt(cropframe.clientHeight / 2, 10),
+				left: evtpos.pageX - parseInt(cropframe.clientWidth / 2, 10)
 			});
 		},
 		_painter_movement: function(e) {
 			var pos = {};
 			var target = e.target || e.srcElement,
-			rect = target.getBoundingClientRect();
-			pos.x = e.clientX - rect.left;
-			pos.y = e.clientY - rect.top;
+			rect = target.getBoundingClientRect(),
+			evtpos = (e.clientX) ? e : e.originalEvent.touches[0];
+			pos.x = evtpos.clientX - rect.left;
+			pos.y = evtpos.clientY - rect.top;
 			if(!this._variables.prev_pos) {
 				return this._variables.prev_pos = pos;
 			}
