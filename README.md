@@ -1,7 +1,7 @@
 picEdit
 =======
 
-*This plugin is work in progress! Don't use it in production!* 
+*This plugin is work in progress! Use with caution!* 
 
 The plugin will turn your form's ```<input type="file"...``` box into a tiny image editor. Perform basic image operations and preview your image before uploading to the server. The functionality for the plugin is very similar to the one introduced in pasteboard.co website.
 
@@ -28,7 +28,7 @@ See the demo here: http://andyvr.github.io/picEdit/
 
 **maxWidth**
 
-_type: int/auto, default: 400_ - max width for the picedit element (the image will not be re-scaled if it's wider, this parameter controls image preview only)
+_type: int/auto, default: 400_ - max width for the picedit element (the original image will not be re-scaled if it's wider than maxWidth, this parameter controls image preview only)
 
 **maxHeight**
 
