@@ -26,7 +26,8 @@
 			redirectUrl: false,				// Page url for redirect on form submit
 			maxWidth: 400,						// max width parameter
 			maxHeight: 'auto',					// max height parameter
-			aspectRatio: true					//
+			aspectRatio: true,					//
+            defaultImage: false
         };
 
     // The actual plugin constructor
@@ -190,7 +191,13 @@
 				this._variables.pen_color = "black";
 				this._variables.pen_size = false;
 				this._variables.prev_pos = false;
+                // Load default image if one is set
+                if(this.options.defaultImage) _this.set_default_image(this.options.defaultImage);
 		},
+        // Set the default Image
+        set_default_image: function (path) {
+            this._create_image_with_datasrc(path);
+        },
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
 			var msgbox = this._messagebox;
