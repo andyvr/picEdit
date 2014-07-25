@@ -44,7 +44,7 @@ _type: string/bool, default: false_ - the form redirect url. When defined will r
 
 **imageUpdated**
 
-_type: func_ - the callback function to be called every time the image is updated. Takes image object as the first parameter.
+_type: func_ - the callback function to be called when the image is updated/changed. Exposes the image object in the first parameter of the function.
 ```
 $('#image').picEdit({
   imageUpdated: function(img){
