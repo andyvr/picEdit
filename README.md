@@ -3,7 +3,7 @@ picEdit
 
 *This plugin is work in progress! Use with caution!* 
 
-The plugin will turn your form's ```<input type="file"...``` box into a tiny image editor. Perform basic image operations and preview your image before uploading to the server. The functionality for the plugin is very similar to the one introduced in pasteboard.co website.
+The plugin will turn your form's ```<input type="file"...``` box into a tiny image editor/uploader. Perform basic image operations and preview your image before uploading to the server. The functionality for the plugin is very similar to the one introduced in pasteboard.co website and photobooth.js library.
 
 In other words, your good old html form with the file upload field, like this:
 <p align="center">
@@ -25,6 +25,10 @@ Once you're done with the image manipulations you can just upload the form as us
 
 See the demo here: http://andyvr.github.io/picEdit/
 ###Available methods and options
+
+**defaultImage**
+
+_type: string, default: false_ - an image to be loaded in the editor by default ('path/to/image')
 
 **maxWidth**
 
