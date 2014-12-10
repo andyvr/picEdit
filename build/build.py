@@ -41,10 +41,10 @@ def compile_css():
     file = open("../src/css/font.css", "r")
     src_style1 = file.read()
     file.close()
-    file = open("../src/css/styles.css", "r")
+    file = open("../src/css/picedit.css", "r")
     src_style2 = file.read()
     file.close()
-    file = open("../dist/css/styles.css", "w")
+    file = open("../dist/css/picedit.css", "w")
     css_source = src_style1 + "\n" + src_style2
     file.write(css_source)
     file.close()
@@ -54,7 +54,7 @@ def compile_css():
     headers = {'Content-type': 'application/x-www-form-urlencoded'}
     http = Http()
     resp, content = http.request(url, "POST", headers=headers, body=urlencode(body))
-    file = open("../dist/css/styles.min.css", "w")
+    file = open("../dist/css/picedit.min.css", "w")
     file.write(content)
     file.close()
 
