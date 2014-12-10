@@ -196,7 +196,7 @@
 		},
         // Set the default Image
         set_default_image: function (path) {
-            this._create_image_with_datasrc(path);
+            this._create_image_with_datasrc(path, false, false, true);
         },
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
@@ -392,13 +392,21 @@
 			this._cropping.cropbox.removeClass("active");
 		},
 		// Create and update image from datasrc
-		_create_image_with_datasrc: function(datasrc, callback, file) {
+		_create_image_with_datasrc: function(datasrc, callback, file, dataurl) {
 			var _this = this;
 			var img = document.createElement("img");
 			if(file) img.file = file;
 			img.src = datasrc;
 			img.onload = function() {
-				_this._image = img;
+				if(dataurl) {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    img.src = canvas.toDataURL('image/png');
+                }
+                _this._image = img;
 				_this._resizeViewport();
 				_this._paintCanvas();
 				_this.options.imageUpdated(_this._image);
