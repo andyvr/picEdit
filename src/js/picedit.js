@@ -1,8 +1,8 @@
 /*
  *  Project: PicEdit
  *  Description: Creates an image upload box with tools to edit images on the front-end before uploading
- *  Author: 
- *  License: 
+ *  Author: Andy V.
+ *  License: MIT
  */
 
 // the semi-colon before function invocation is a safety net against concatenated
@@ -18,22 +18,22 @@
     // as this (slightly) quickens the resolution process and can be more efficiently
     // minified (especially when both are regularly referenced in your plugin).
 
-    // Create the defaults once
+    // Create the default params object
     var pluginName = 'picEdit',
         defaults = {
 			imageUpdated: function(img){},	// Image updated callback function
-			formSubmitted: function(){},		// On form submit callback function
+			formSubmitted: function(){},	// After form was submitted callback function
 			redirectUrl: false,				// Page url for redirect on form submit
-			maxWidth: 400,						// max width parameter
-			maxHeight: 'auto',					// max height parameter
-			aspectRatio: true,					//
-            defaultImage: false
+			maxWidth: 400,					// Max width parameter
+			maxHeight: 'auto',				// Max height parameter
+			aspectRatio: true,				// Preserve aspect ratio
+            defaultImage: false             // Default image to be used with the plugin
         };
 
     // The actual plugin constructor
     function Plugin( element, options ) {
         this.inputelement = element;
-		 this.element = element;
+        this.element = element;
 
         // jQuery has an extend method which merges the contents of two or
         // more objects, storing the result in the first object. The first object
@@ -43,21 +43,21 @@
 
         this._defaults = defaults;
         this._name = pluginName;
-		 // Reference to the loaded image
-		 this._image = false;
-		 // Reference to the filename of the loaded image
-		 this._filename = "";
-		 // Interface variables (data synced from the user interface)
-		 this._variables = {};
-		 
-		 /* Prepare the template */
-		 /*unhide_in_prod*/
-		 /*this._template();*/
-		 /*unhide_in_prod*/
-		 
-		 /*hide_in_prod*/
+        // Reference to the loaded image
+        this._image = false;
+        // Reference to the filename of the loaded image
+        this._filename = "";
+        // Interface variables (data synced from the user interface)
+        this._variables = {};
+
+        /* Prepare the template */
+        /*unhide_in_prod*/
+        /*this._template();*/
+        /*unhide_in_prod*/
+
+        /*hide_in_prod*/
         this.init();
-		/*hide_in_prod*/
+        /*hide_in_prod*/
     }
 
 	Plugin.prototype = {
@@ -66,14 +66,12 @@
 				// You already have access to the DOM element and
 				// the options via the instance, e.g. this.element
 				// and this.settings
-				// you can add more functions like the one below and
-				// call them like so: this.yourOtherFunction(this.element, this.settings).
 				
 				// Save instance of this for inline functions
 				var _this = this;
 				// Get reference to the file input box
 				this._fileinput = $('<input type="file" accept="image/*">');
-				// Get reference to the canvas element
+				// Get reference to the main canvas element
 				this._canvas = $(this.element).find(".picedit_canvas > canvas")[0];
 				// Create and set the 2d context for the canvas
 				this._ctx = this._canvas.getContext("2d");
@@ -87,7 +85,7 @@
 				// Save the reference to the messaging box
 		 		this._messagebox = $(this.element).find(".picedit_message");
 		 		this._messagetimeout = false;
-				// Reference to the main buttons holder
+				// Reference to the main/top nav buttons holder
 				this._mainbuttons = $(this.element).find(".picedit_action_btns");
 				// Size of the viewport to display image (a resized image will be displayed)
 				 this._viewport = {
