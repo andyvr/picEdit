@@ -29,6 +29,7 @@ See the demo here: http://andyvr.github.io/picEdit/
 **defaultImage**
 
 _type: string, default: false_ - an image to be loaded in the editor by default ('path/to/image')
+<h6><i>use only images located on the same server to prevent CORS issues</i></h6>
 
 **maxWidth**
 
@@ -44,7 +45,7 @@ _type: string/bool, default: false_ - the form redirect url. When defined will r
 
 **imageUpdated**
 
-_type: func_ - the callback function to be called when the image is updated/changed. Exposes the image object in the first parameter of the function.
+_type: func_ - the callback function to be called when the image is updated/changed. Exposes the image object as the first parameter of the function.
 ```
 $('#image').picEdit({
   imageUpdated: function(img){
@@ -55,10 +56,10 @@ $('#image').picEdit({
 
 **formSubmitted**
 
-_type: func_ - the callback function to be called once the form is submitted to the server. Takes no parameters.
+_type: func_ - the callback function to be called once the form is submitted to the server. Exposes the XMLHttpRequest response object as the first parameter of the function.
 ```
 $('#image').picEdit({
-  formSubmitted: function(){
+  formSubmitted: function(response){
      alert('Form submitted!');
   }
 });
