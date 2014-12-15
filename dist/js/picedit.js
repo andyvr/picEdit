@@ -82,9 +82,10 @@
                 if(!this.check_browser_capabilities()) {
                     if(type != "file") {
                         $(this.inputelement).prop("type", "file");
+                        $(this._fileinput).remove();
                     }
                     $(this.inputelement).show();
-                    $(this._fileinput).remove();
+                    $(this.element).remove();
                     return;
                 }
 				// Get reference to the main canvas element
