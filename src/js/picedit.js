@@ -69,8 +69,24 @@
 				
 				// Save instance of this for inline functions
 				var _this = this;
-				// Get reference to the file input box
-				this._fileinput = $('<input type="file" accept="image/*">');
+                // Get type of element to be used (type="file" and type="picedit" are supported)
+                var type = $(this.inputelement).prop("type");
+                if(type == "file")
+                    this._fileinput = $(this.inputelement);
+                else {
+                    // Create a reference to the file input box
+                    $(this.inputelement).after('<input type="file" style="display:none" accept="image/*">');
+				    this._fileinput = $(this.inputelement).next("input");
+                }
+                // Show regular file upload on old browsers
+                if(!this.check_browser_capabilities()) {
+                    if(type != "file") {
+                        $(this.inputelement).prop("type", "file");
+                    }
+                    $(this.inputelement).show();
+                    $(this._fileinput).remove();
+                    return;
+                }
 				// Get reference to the main canvas element
 				this._canvas = $(this.element).find(".picedit_canvas > canvas")[0];
 				// Create and set the 2d context for the canvas
@@ -178,6 +194,7 @@
 				// Define formdata element
 				this._theformdata = false;
 				this._theform = $(this.inputelement).parents("form");
+                // Bind form submit event
 				if(this._theform.length) {
 					this._theform.on("submit", function(){ return _this._formsubmit(); });
 				}
@@ -192,6 +209,12 @@
                 // Load default image if one is set
                 if(this.options.defaultImage) _this.set_default_image(this.options.defaultImage);
 		},
+        // Check Browser Capabilities (determine if the picedit should run, or leave the default file-input field)
+        check_browser_capabilities: function () {
+            if(!!window.CanvasRenderingContext2D == false) return false; //check canvas support
+            if(!window.FileReader) return false; //check file reader support
+            return true;    //otherwise return true
+        },
         // Set the default Image
         set_default_image: function (path) {
             this._create_image_with_datasrc(path, false, false, true);
@@ -373,11 +396,6 @@
 				_this._create_image_with_datasrc(canvas.toDataURL("image/png"), function() {
 					_this.hide_messagebox();
 				});
-				/*_this._image.src = canvas.toDataURL("image/png");
-				_this._resizeViewport();
-				_this._paintCanvas();
-				_this.options.imageUpdated(_this._image);
-				_this.hide_messagebox();*/
 			});
 			this.crop_close();
 		},
