@@ -235,7 +235,7 @@
 		},
 		// Open message box alert with defined text autohide after number of milliseconds, display loading spinner
 		set_messagebox: function (text, autohide, closebutton) {
-			autohide = typeof autohide !== 'undefined' ? autohide : 2000;
+			autohide = typeof autohide !== 'undefined' ? autohide : 3000;
 			closebutton = typeof closebutton !== 'undefined' ? closebutton : true;
 			var classes = "active";
 			if(!closebutton) classes += " no_close_button";
@@ -692,7 +692,14 @@
 					}
 					//send request
 					var request = new XMLHttpRequest();
-					request.open(_this._theform.prop("method"), _this._theform.prop("action"));
+                    request.onprogress = function(e) {
+                        if(e.lengthComputable) var total = e.total;
+                        else var total = Math.ceil(inputblob.size * 1.3);
+                        var progress = Math.ceil(((e.loaded)/total)*100);
+                        if (progress > 100) progress = 100;
+                        _this.set_messagebox("Please Wait... Uploading... " + progress + "% Uploaded.", false, false);
+                    };
+					request.open(_this._theform.prop("method"), _this._theform.prop("action"), true);
 					request.onload = function(e) {
 						if(this.status != 200) {
                             _this.set_messagebox("Server did not accept data!");
