@@ -22,7 +22,7 @@
     var pluginName = 'picEdit',
         defaults = {
 			imageUpdated: function(img){},	// Image updated callback function
-			formSubmitted: function(){},	// After form was submitted callback function
+			formSubmitted: function(res){},	// After form was submitted callback function
 			redirectUrl: false,				// Page url for redirect on form submit
 			maxWidth: 400,					// Max width parameter
 			maxHeight: 'auto',				// Max height parameter
@@ -694,10 +694,15 @@
 					var request = new XMLHttpRequest();
 					request.open(_this._theform.prop("method"), _this._theform.prop("action"));
 					request.onload = function(e) {
-						if(_this.options.redirectUrl === true) window.location.reload();
-						else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
-						else _this.set_messagebox("Data successfully submitted!");
-						_this.options.formSubmitted();
+						if(this.status != 200) {
+                            _this.set_messagebox("Server did not accept data!");
+                        }
+                        else {
+                            if(_this.options.redirectUrl === true) window.location.reload();
+						    else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
+						    else _this.set_messagebox("Data successfully submitted!");
+                        }
+						_this.options.formSubmitted(this);
 					};
 					request.send(_this._theformdata);
 				});
