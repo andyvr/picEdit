@@ -23,6 +23,8 @@ will change to something more user-friendly:
 The plugin allows to perform image rotations, cropping, resizing and pen tool.
 Once you're done with the image manipulations you can just upload the form as usual, the updated image will be uploaded along with the form as the a part of the form.
 
+<h6><i>Note: Due to limitations of HTML5 Form API the form will be submitted with XMLHttpRequest/Ajax. The submission is handled by picEdit. If your form uses any js plugins or custom javascript this can create issues!</i></h6>
+
 See the demo here: http://andyvr.github.io/picEdit/
 ###Available methods and options
 
