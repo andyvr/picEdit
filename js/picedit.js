@@ -1,14 +1,14 @@
 /*
  *  Project: PicEdit
  *  Description: Creates an image upload box with tools to edit images on the front-end before uploading
- *  Author: 
- *  License: 
+ *  Author: Andy V.
+ *  License: MIT
  */
 
 // the semi-colon before function invocation is a safety net against concatenated
 // scripts and/or other plugins which may not be closed properly.
 ;(function ( $, window, document, undefined ) {
-
+    "use strict";
     // undefined is used here as the undefined global variable in ECMAScript 3 is
     // mutable (ie. it can be changed by someone else). undefined isn't really being
     // passed in so we can ensure the value of it is truly undefined. In ES5, undefined
@@ -18,21 +18,22 @@
     // as this (slightly) quickens the resolution process and can be more efficiently
     // minified (especially when both are regularly referenced in your plugin).
 
-    // Create the defaults once
+    // Create the default params object
     var pluginName = 'picEdit',
         defaults = {
 			imageUpdated: function(img){},	// Image updated callback function
-			formSubmitted: function(){},		// On form submit callback function
+			formSubmitted: function(res){},	// After form was submitted callback function
 			redirectUrl: false,				// Page url for redirect on form submit
-			maxWidth: 400,						// max width parameter
-			maxHeight: 'auto',					// max height parameter
-			aspectRatio: true					//
+			maxWidth: 400,					// Max width parameter
+			maxHeight: 'auto',				// Max height parameter
+			aspectRatio: true,				// Preserve aspect ratio
+            defaultImage: false             // Default image to be used with the plugin
         };
 
     // The actual plugin constructor
     function Plugin( element, options ) {
         this.inputelement = element;
-		 this.element = element;
+        this.element = element;
 
         // jQuery has an extend method which merges the contents of two or
         // more objects, storing the result in the first object. The first object
@@ -42,21 +43,21 @@
 
         this._defaults = defaults;
         this._name = pluginName;
-		 // Reference to the loaded image
-		 this._image = false;
-		 // Reference to the filename of the loaded image
-		 this._filename = "";
-		 // Interface variables (data synced from the user interface)
-		 this._variables = {};
-		 
-		 /* Prepare the template */
-		 /*unhide_in_prod*/
-		 /*this._template();*/
-		 /*unhide_in_prod*/
-		 
-		 /*hide_in_prod*/
+        // Reference to the loaded image
+        this._image = false;
+        // Reference to the filename of the loaded image
+        this._filename = "";
+        // Interface variables (data synced from the user interface)
+        this._variables = {};
+
+        /* Prepare the template */
+        /*unhide_in_prod*/
+        /*this._template();*/
+        /*unhide_in_prod*/
+
+        /*hide_in_prod*/
         this.init();
-		/*hide_in_prod*/
+        /*hide_in_prod*/
     }
 
 	Plugin.prototype = {
@@ -65,14 +66,29 @@
 				// You already have access to the DOM element and
 				// the options via the instance, e.g. this.element
 				// and this.settings
-				// you can add more functions like the one below and
-				// call them like so: this.yourOtherFunction(this.element, this.settings).
 				
 				// Save instance of this for inline functions
 				var _this = this;
-				// Get reference to the file input box
-				this._fileinput = $('<input type="file" accept="image/*">');
-				// Get reference to the canvas element
+                // Get type of element to be used (type="file" and type="picedit" are supported)
+                var type = $(this.inputelement).prop("type");
+                if(type == "file")
+                    this._fileinput = $(this.inputelement);
+                else {
+                    // Create a reference to the file input box
+                    $(this.inputelement).after('<input type="file" style="display:none" accept="image/*">');
+				    this._fileinput = $(this.inputelement).next("input");
+                }
+                // Show regular file upload on old browsers
+                if(!this.check_browser_capabilities()) {
+                    if(type != "file") {
+                        $(this.inputelement).prop("type", "file");
+                        $(this._fileinput).remove();
+                    }
+                    $(this.inputelement).show();
+                    $(this.element).remove();
+                    return;
+                }
+				// Get reference to the main canvas element
 				this._canvas = $(this.element).find(".picedit_canvas > canvas")[0];
 				// Create and set the 2d context for the canvas
 				this._ctx = this._canvas.getContext("2d");
@@ -86,7 +102,7 @@
 				// Save the reference to the messaging box
 		 		this._messagebox = $(this.element).find(".picedit_message");
 		 		this._messagetimeout = false;
-				// Reference to the main buttons holder
+				// Reference to the main/top nav buttons holder
 				this._mainbuttons = $(this.element).find(".picedit_action_btns");
 				// Size of the viewport to display image (a resized image will be displayed)
 				 this._viewport = {
@@ -179,6 +195,7 @@
 				// Define formdata element
 				this._theformdata = false;
 				this._theform = $(this.inputelement).parents("form");
+                // Bind form submit event
 				if(this._theform.length) {
 					this._theform.on("submit", function(){ return _this._formsubmit(); });
 				}
@@ -190,7 +207,19 @@
 				this._variables.pen_color = "black";
 				this._variables.pen_size = false;
 				this._variables.prev_pos = false;
+                // Load default image if one is set
+                if(this.options.defaultImage) _this.set_default_image(this.options.defaultImage);
 		},
+        // Check Browser Capabilities (determine if the picedit should run, or leave the default file-input field)
+        check_browser_capabilities: function () {
+            if(!!window.CanvasRenderingContext2D == false) return false; //check canvas support
+            if(!window.FileReader) return false; //check file reader support
+            return true;    //otherwise return true
+        },
+        // Set the default Image
+        set_default_image: function (path) {
+            this._create_image_with_datasrc(path, false, false, true);
+        },
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
 			var msgbox = this._messagebox;
@@ -206,7 +235,7 @@
 		},
 		// Open message box alert with defined text autohide after number of milliseconds, display loading spinner
 		set_messagebox: function (text, autohide, closebutton) {
-			autohide = typeof autohide !== 'undefined' ? autohide : 2000;
+			autohide = typeof autohide !== 'undefined' ? autohide : 3000;
 			closebutton = typeof closebutton !== 'undefined' ? closebutton : true;
 			var classes = "active";
 			if(!closebutton) classes += " no_close_button";
@@ -368,11 +397,6 @@
 				_this._create_image_with_datasrc(canvas.toDataURL("image/png"), function() {
 					_this.hide_messagebox();
 				});
-				/*_this._image.src = canvas.toDataURL("image/png");
-				_this._resizeViewport();
-				_this._paintCanvas();
-				_this.options.imageUpdated(_this._image);
-				_this.hide_messagebox();*/
 			});
 			this.crop_close();
 		},
@@ -385,13 +409,21 @@
 			this._cropping.cropbox.removeClass("active");
 		},
 		// Create and update image from datasrc
-		_create_image_with_datasrc: function(datasrc, callback, file) {
+		_create_image_with_datasrc: function(datasrc, callback, file, dataurl) {
 			var _this = this;
 			var img = document.createElement("img");
 			if(file) img.file = file;
 			img.src = datasrc;
 			img.onload = function() {
-				_this._image = img;
+				if(dataurl) {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    img.src = canvas.toDataURL('image/png');
+                }
+                _this._image = img;
 				_this._resizeViewport();
 				_this._paintCanvas();
 				_this.options.imageUpdated(_this._image);
@@ -660,12 +692,24 @@
 					}
 					//send request
 					var request = new XMLHttpRequest();
-					request.open(_this._theform.prop("method"), _this._theform.prop("action"));
+                    request.onprogress = function(e) {
+                        if(e.lengthComputable) var total = e.total;
+                        else var total = Math.ceil(inputblob.size * 1.3);
+                        var progress = Math.ceil(((e.loaded)/total)*100);
+                        if (progress > 100) progress = 100;
+                        _this.set_messagebox("Please Wait... Uploading... " + progress + "% Uploaded.", false, false);
+                    };
+					request.open(_this._theform.prop("method"), _this._theform.prop("action"), true);
 					request.onload = function(e) {
-						if(_this.options.redirectUrl === true) window.location.reload();
-						else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
-						else _this.set_messagebox("Data successfully submitted!");
-						_this.options.formSubmitted();
+						if(this.status != 200) {
+                            _this.set_messagebox("Server did not accept data!");
+                        }
+                        else {
+                            if(_this.options.redirectUrl === true) window.location.reload();
+						    else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
+						    else _this.set_messagebox("Data successfully submitted!");
+                        }
+						_this.options.formSubmitted(this);
 					};
 					request.send(_this._theformdata);
 				});

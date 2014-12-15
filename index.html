@@ -2,16 +2,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Untitled Document</title>
+<title>PicEdit Demo</title>
 
 <link rel="stylesheet" type="text/css" href="css/font.css" />
-<link rel="stylesheet" type="text/css" href="css/styles.css" />
+<link rel="stylesheet" type="text/css" href="css/picedit.css" />
 
 </head>
 <body>
 
 <form name="testform" action="out.php" method="post" enctype="multipart/form-data">
-<input type="hidden" value="test value" name="testinput">
+
 
 <div style="margin:10% auto 0 auto; display: table;">
 
@@ -143,11 +143,18 @@
 
 </form>
 
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript" src="js/picedit.js"></script>
 <script type="text/javascript">
 	$(function() {
-		$('.picedit_box').picEdit();
+		$('.picedit_box').picEdit({
+			imageUpdated: function(img){
+			},
+			formSubmitted: function(){
+			},
+			redirectUrl: false,
+            defaultImage: false
+		});
 	});
 </script>
 
