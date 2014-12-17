@@ -249,11 +249,11 @@
 		// Toggle button and update variables
 		toggle_button: function (elem) {
 			if($(elem).hasClass("active")) {
-				value = false;
+				var value = false;
 				$(elem).removeClass("active");
 			}
 			else {
-				value = true;
+				var value = true;
 				$(elem).siblings().removeClass("active");
 				$(elem).addClass("active");
 			}
