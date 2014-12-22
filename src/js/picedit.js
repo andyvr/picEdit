@@ -412,6 +412,7 @@
 		_create_image_with_datasrc: function(datasrc, callback, file, dataurl) {
 			var _this = this;
 			var img = document.createElement("img");
+            img.setAttribute('crossOrigin', 'anonymous');
 			if(file) img.file = file;
 			img.src = datasrc;
 			img.onload = function() {
