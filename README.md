@@ -78,7 +78,7 @@ $('#image').picEdit({
 <script type="text/javascript" src="dist/js/picedit.min.js"></script>
 ```
 
-**Create a form in your html with the file upload input box (ex.:)**
+**Create a form in your html code with the file upload input box ex.:**
 
 ```
 <form action="upload.php" method="post">
