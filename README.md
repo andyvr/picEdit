@@ -74,7 +74,7 @@ $('#image').picEdit({
 
 ```
 <link rel="stylesheet" type="text/css" href="dist/css/picedit.min.css" />
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript" src="dist/js/picedit.min.js"></script>
 ```
 
