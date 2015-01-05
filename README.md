@@ -43,7 +43,7 @@ _type: int/auto, default: auto_ - max height for the picedit element (same as wi
 
 **redirectUrl**
 
-_type: string/bool, default: false_ - the form redirect url. When defined will redirect the user to the specified url.
+_type: string/bool, default: false_ - the form redirect url. When defined it will redirect the user to the specified url after the form is submitted.
 
 **imageUpdated**
 
