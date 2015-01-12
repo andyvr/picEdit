@@ -26,6 +26,37 @@ Once you're done with the image manipulations you can just upload the form as us
 <h6><i>Note: Due to limitations of HTML5 Form API the form will be submitted with XMLHttpRequest/Ajax. The submission is handled by picEdit. If your form uses any js plugins or custom javascript this can create issues!</i></h6>
 
 See the demo here: http://andyvr.github.io/picEdit/
+###Usage Example
+
+**Include jquery, the plugin js and css files**
+
+```
+<link rel="stylesheet" type="text/css" href="dist/css/picedit.min.css" />
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="dist/js/picedit.min.js"></script>
+```
+
+**Create a form in your html code with the file upload input box ex.:**
+
+```
+<form action="upload.php" method="post">
+	Name: <input type="text" name="name">
+	Image: <input type="file" name="image" id="image">
+	<button type="submit">Submit</button>
+</form>
+```
+
+**Bind the plugin to the file upload input box, that's it!**
+
+```
+<script type="text/javascript">
+	$(function() {
+		$('#image').picEdit();
+	});
+</script>
+```
+
+
 ###Available methods and options
 
 **defaultImage**
@@ -67,36 +98,6 @@ $('#image').picEdit({
 });
 ```
 
-
-###Usage Example
-
-**Include jquery, the plugin js and css files**
-
-```
-<link rel="stylesheet" type="text/css" href="dist/css/picedit.min.css" />
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script type="text/javascript" src="dist/js/picedit.min.js"></script>
-```
-
-**Create a form in your html code with the file upload input box ex.:**
-
-```
-<form action="upload.php" method="post">
-	Name: <input type="text" name="name">
-	Image: <input type="file" name="image" id="image">
-	<button type="submit">Submit</button>
-</form>
-```
-
-**Bind the plugin to the file upload input box, that's it!**
-
-```
-<script type="text/javascript">
-	$(function() {
-		$('#image').picEdit();
-	});
-</script>
-```
 
 <p align="center">
 <img src="../../raw/gh-pages/img/img1.jpg" />
