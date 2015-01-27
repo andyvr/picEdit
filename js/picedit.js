@@ -1,6 +1,6 @@
 /*
  *  Project: PicEdit
- *  Description: Creates an image upload box with tools to edit images on the front-end before uploading
+ *  Description: Creates an image upload box with tools to edit the image on the front-end before uploading it to the server
  *  Author: Andy V.
  *  License: MIT
  */
@@ -152,11 +152,11 @@
 				// If Firefox (doesn't support clipboard object), create DIV to catch pasted image
 				if (!window.Clipboard) { // Firefox
 					var pasteCatcher = $(document.createElement("div"));
-					pasteCatcher.attr("contenteditable","true").css({
+					pasteCatcher.prop("contenteditable","true").css({
 						"position" : "absolute", 
-						"left" : "-999",
-						"width" : "0",
-						"height" : "0",
+						"left" : -999,
+						"width" : 0,
+						"height" : 0,
 						"overflow" : "hidden",
 						"outline" : 0,
 						"opacity" : 0
@@ -169,15 +169,18 @@
 					var blob;
 					if(!items) {
 						pasteCatcher.get(0).focus();
-						setTimeout(function(){
-							var child = pasteCatcher.children().last().get(0);
+                        pasteCatcher.on('DOMSubtreeModified', function(){
+                            var child = pasteCatcher.children().last().get(0);
 							pasteCatcher.html("");
 							if (child) {
 								if (child.tagName === "IMG" && child.src.substr(0, 5) == 'data:') {
 									_this._create_image_with_datasrc(child.src);
 								}
+                                else if (child.tagName === "IMG" && child.src.substr(0, 4) == 'http') {
+									_this._create_image_with_datasrc(child.src, false, false, true);
+								}
 							}
-						}, 800);
+                        });
 					}
 					else {
 						for (var i = 0; i < items.length; i++) {
@@ -412,6 +415,7 @@
 		_create_image_with_datasrc: function(datasrc, callback, file, dataurl) {
 			var _this = this;
 			var img = document.createElement("img");
+            if(dataurl) img.setAttribute('crossOrigin', 'anonymous');
 			if(file) img.file = file;
 			img.src = datasrc;
 			img.onload = function() {
