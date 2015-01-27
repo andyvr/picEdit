@@ -169,15 +169,18 @@
 					var blob;
 					if(!items) {
 						pasteCatcher.get(0).focus();
-						setTimeout(function(){
-							var child = pasteCatcher.children().last().get(0);
+                        pasteCatcher.on('DOMSubtreeModified', function(){
+                            var child = pasteCatcher.children().last().get(0);
 							pasteCatcher.html("");
 							if (child) {
 								if (child.tagName === "IMG" && child.src.substr(0, 5) == 'data:') {
 									_this._create_image_with_datasrc(child.src);
 								}
+                                else if (child.tagName === "IMG" && child.src.substr(0, 4) == 'http') {
+									_this._create_image_with_datasrc(child.src, false, false, true);
+								}
 							}
-						}, 800);
+                        });
 					}
 					else {
 						for (var i = 0; i < items.length; i++) {
