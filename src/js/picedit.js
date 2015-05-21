@@ -419,14 +419,21 @@
 			if(file) img.file = file;
 			img.src = datasrc;
 			img.onload = function() {
+				var image = null;
 				if(dataurl) {
                     var canvas = document.createElement('canvas');
                     var ctx = canvas.getContext('2d');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
-                    img.src = canvas.toDataURL('image/png');
+                    image = document.createElement("img");
+                    image.src = canvas.toDataURL('image/png');
                 }
+				if ( image != null){
+					_this._image = image;
+				}else{
+					_this._image = img;
+				}
                 _this._image = img;
 				_this._resizeViewport();
 				_this._paintCanvas();
