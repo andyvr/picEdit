@@ -429,12 +429,9 @@
                     image = document.createElement("img");
                     image.src = canvas.toDataURL('image/png');
                 }
-				if ( image != null){
-					_this._image = image;
-				}else{
-					_this._image = img;
-				}
-                _this._image = img;
+				
+				_this._image = ( image != null) ? image : img; 
+
 				_this._resizeViewport();
 				_this._paintCanvas();
 				_this.options.imageUpdated(_this._image);
