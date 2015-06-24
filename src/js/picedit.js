@@ -27,6 +27,7 @@
 			maxWidth: 400,					// Max width parameter
 			maxHeight: 'auto',				// Max height parameter
 			aspectRatio: true,				// Preserve aspect ratio
+			submitForm: true,				// submit the form, false for multiple images (up until the last one)
             defaultImage: false             // Default image to be used with the plugin
         };
 
@@ -695,7 +696,8 @@
 						_this._theformdata.append(inputname, inputblob, _this._filename);
 					}
 					//send request
-					var request = new XMLHttpRequest();
+		if(_this.options.submitForm) {
+		    var request = new XMLHttpRequest();
                     request.onprogress = function(e) {
                         if(e.lengthComputable) var total = e.total;
                         else var total = Math.ceil(inputblob.size * 1.3);
@@ -717,6 +719,7 @@
 					};
 					request.send(_this._theformdata);
 				});
+			}
 			}
 			return false;
 		},
