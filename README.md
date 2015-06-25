@@ -64,6 +64,15 @@ See the demo here: http://andyvr.github.io/picEdit/
 _type: string, default: false_ - an image to be loaded in the editor by default ('path/to/image')
 <h6><i>use only images located on the same server to prevent CORS issues</i></h6>
 
+**submitForm**
+
+_type: bool, default: true_ - boolean to automatically submit the form, set to true. To wait to submit the form (if multiple image inputs are present), set all but the last instance to false. 
+
+```
+	$('#image_1').picEdit({ submitForm: false });
+	$('#image_2').picEdit({ submitForm: true });
+```
+
 **maxWidth**
 
 _type: int/auto, default: 400_ - max width for the picedit element (the original image will not be re-scaled if it's wider than maxWidth, this parameter controls image preview only)
