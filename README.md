@@ -75,6 +75,7 @@ _type: bool, default: true_ - boolean to automatically submit the form, set to t
 		$('#image_2').picEdit({ submitForm: true });
 	});
 </script>
+```
 
 **maxWidth**
 
