@@ -66,7 +66,15 @@ _type: string, default: false_ - an image to be loaded in the editor by default 
 
 **submitForm**
 
-_type: bool, default: true_- boolean to automatically submit the form, or wait to submit the form (if multiple image inputs are present)
+_type: bool, default: true_ - boolean to automatically submit the form, set to true. To wait to submit the form (if multiple image inputs are present), set all but the last instance to false. 
+
+```
+<script type="text/javascript">
+	$(function() {
+		$('#image_1').picEdit({ submitForm: false });
+		$('#image_2').picEdit({ submitForm: true });
+	});
+</script>
 
 **maxWidth**
 
