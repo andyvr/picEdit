@@ -687,39 +687,48 @@
 			else {
 				var _this = this;
 				this.set_loading().delay(200).promise().done(function() {
-					_this._theformdata = new FormData(_this._theform[0]);
+					try {
+						if(window.form_data) {
+							console.log("Form Data Already Created");
+						} else {
+							window.form_data = new FormData(_this._theform[0]);
+							console.log("Creating Form Data");
+						}
+					}
+					catch(e) {
+					}
 					if(_this._image) {
 						var inputname = $(_this.inputelement).prop("name") || "file";
 						var inputblob = _this._dataURItoBlob(_this._image.src);
 						if(!_this._filename) _this._filename = inputblob.type.replace("/", ".");
 						else _this._filename = _this._filename.match(/^[^\.]*/) + "." + inputblob.type.match(/[^\/]*$/);
-						_this._theformdata.append(inputname, inputblob, _this._filename);
+						window.form_data.append(inputname, inputblob, _this._filename);
 					}
 					//send request
-		if(_this.options.submitForm) {
-		    var request = new XMLHttpRequest();
-                    request.onprogress = function(e) {
-                        if(e.lengthComputable) var total = e.total;
-                        else var total = Math.ceil(inputblob.size * 1.3);
-                        var progress = Math.ceil(((e.loaded)/total)*100);
-                        if (progress > 100) progress = 100;
-                        _this.set_messagebox("Please Wait... Uploading... " + progress + "% Uploaded.", false, false);
-                    };
-					request.open(_this._theform.prop("method"), _this._theform.prop("action"), true);
-					request.onload = function(e) {
-						if(this.status != 200) {
-                            _this.set_messagebox("Server did not accept data!");
-                        }
-                        else {
-                            if(_this.options.redirectUrl === true) window.location.reload();
-						    else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
-						    else _this.set_messagebox("Data successfully submitted!");
-                        }
-						_this.options.formSubmitted(this);
-					};
-					request.send(_this._theformdata);
+					if(_this.options.submitForm === true) {
+						var request = new XMLHttpRequest();
+						request.onprogress = function(e) {
+							if(e.lengthComputable) var total = e.total;
+							else var total = Math.ceil(inputblob.size * 1.3);
+							var progress = Math.ceil(((e.loaded)/total)*100);
+							if (progress > 100) progress = 100;
+							_this.set_messagebox("Please Wait... Uploading... " + progress + "% Uploaded.", false, false);
+						};
+						request.open(_this._theform.prop("method"), _this._theform.prop("action"), true);
+						request.onload = function(e) {
+							if(this.status != 200) {
+								_this.set_messagebox("Server did not accept data!");
+							}
+							else {
+								if(_this.options.redirectUrl === true) window.location.reload();
+								else if(_this.options.redirectUrl) window.location = _this.options.redirectUrl;
+								else _this.set_messagebox("Data successfully submitted!");
+							}
+							_this.options.formSubmitted(this);
+						};
+						request.send(window.form_data);
+					}
 				});
-			}
 			}
 			return false;
 		},
