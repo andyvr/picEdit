@@ -433,6 +433,7 @@
 				_this.options.imageUpdated(_this._image);
 				_this._mainbuttons.removeClass("active");
 				if(callback && typeof(callback) == "function") callback();
+				img.onload=null;
 			};
 		},
 		// Functions to controll cropping functionality (drag & resize cropping box)
