@@ -222,6 +222,7 @@
         // Set the default Image
         set_default_image: function (path) {
             this._create_image_with_datasrc(path, false, false, true);
+            this._filename = path;
         },
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
