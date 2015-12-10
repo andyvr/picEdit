@@ -23,6 +23,7 @@
         defaults = {
 			imageUpdated: function(img){},	// Image updated callback function
 			formSubmitted: function(res){},	// After form was submitted callback function
+			fileNameChanged: function(filename){},	// After content is loaded into the canvas from either URL or file
 			redirectUrl: false,				// Page url for redirect on form submit
 			maxWidth: 400,					// Max width parameter
 			maxHeight: 'auto',				// Max height parameter
@@ -128,7 +129,12 @@
 					}
 					var reader = new FileReader();
 					reader.onload = function(e) { 
-						_this._create_image_with_datasrc(e.target.result, false, file); 
+						_this._create_image_with_datasrc(e.target.result, false, file);
+						_this.options.fileLoaded(file);
+						if (file.name != _this._filename) {
+							_this._filename = file.name;
+							_this.options.fileNameChanged(file.name);
+						}
 					};
 					reader.readAsDataURL(file);
 				 }
@@ -222,6 +228,13 @@
         // Set the default Image
         set_default_image: function (path) {
             this._create_image_with_datasrc(path, false, false, true);
+	    var m = path.match(/.*\/(.+?)[\?#]/);
+	    if (m && m.length > 1) {
+	        this._filename = m[1];
+	    } else {
+	        this._filename = path;
+	    }
+	    this.options.fileNameChanged(this._filename);            
         },
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
