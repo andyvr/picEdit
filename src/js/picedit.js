@@ -27,7 +27,8 @@
 			maxWidth: 400,					// Max width parameter
 			maxHeight: 'auto',				// Max height parameter
 			aspectRatio: true,				// Preserve aspect ratio
-            defaultImage: false             // Default image to be used with the plugin
+			defaultImage: false,             		// Default image to be used with the plugin
+			defaultMessageTimeout: 3000			// Default timeout to autohide messages (in milliseconds)
         };
 
     // The actual plugin constructor
@@ -238,7 +239,7 @@
 		},
 		// Open message box alert with defined text autohide after number of milliseconds, display loading spinner
 		set_messagebox: function (text, autohide, closebutton) {
-			autohide = typeof autohide !== 'undefined' ? autohide : 3000;
+			autohide = typeof autohide !== 'undefined' ? autohide : this.options.defaultMessageTimeout;
 			closebutton = typeof closebutton !== 'undefined' ? closebutton : true;
 			var classes = "active";
 			if(!closebutton) classes += " no_close_button";
