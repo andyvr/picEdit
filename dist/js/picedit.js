@@ -426,6 +426,7 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                     img.src = canvas.toDataURL('image/png');
+                    img.onload = null;
                 }
                 _this._image = img;
 				_this._resizeViewport();
