@@ -23,6 +23,7 @@
         defaults = {
 			imageUpdated: function(img){},	// Image updated callback function
 			formSubmitted: function(res){},	// After form was submitted callback function
+			fileLoaded: function(file){},	// After a file is loaded into the canvas			
 			redirectUrl: false,				// Page url for redirect on form submit
 			maxWidth: 400,					// Max width parameter
 			maxHeight: 'auto',				// Max height parameter
@@ -129,7 +130,8 @@
 					}
 					var reader = new FileReader();
 					reader.onload = function(e) { 
-						_this._create_image_with_datasrc(e.target.result, false, file); 
+						_this._create_image_with_datasrc(e.target.result, false, file);
+						_this.options.fileLoaded(file);
 					};
 					reader.readAsDataURL(file);
 				 }
