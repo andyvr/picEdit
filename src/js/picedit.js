@@ -241,14 +241,18 @@
 		set_messagebox: function (text, autohide, closebutton) {
 			autohide = typeof autohide !== 'undefined' ? autohide : this.options.defaultMessageTimeout;
 			closebutton = typeof closebutton !== 'undefined' ? closebutton : true;
-			var classes = "active";
-			if(!closebutton) classes += " no_close_button";
+			this._messagebox.addClass("active");
+			if(closebutton) {
+				this._messagebox.removeClass("no_close_button");
+			} else {
+				this._messagebox.addClass("no_close_button");
+			}
 			if(autohide) {
 				clearTimeout(this._messagetimeout);
 				var _this = this;
 				this._messagetimeout = setTimeout(function(){ _this.hide_messagebox(); }, autohide);
 			}
-			return this._messagebox.addClass(classes).children("div").html(text);
+			return this._messagebox.children("div").html(text);
 		},
 		// Toggle button and update variables
 		toggle_button: function (elem) {
