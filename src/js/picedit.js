@@ -24,11 +24,13 @@
 			imageUpdated: function(img){},	// Image updated callback function
 			formSubmitted: function(res){},	// After form was submitted callback function
 			fileNameChanged: function(filename){},	// After content is loaded into the canvas from either URL or file
+			fileLoaded: function(file){},	// After a file is loaded into the canvas			
 			redirectUrl: false,				// Page url for redirect on form submit
 			maxWidth: 400,					// Max width parameter
 			maxHeight: 'auto',				// Max height parameter
 			aspectRatio: true,				// Preserve aspect ratio
-            defaultImage: false             // Default image to be used with the plugin
+			defaultImage: false,             		// Default image to be used with the plugin
+			defaultMessageTimeout: 3000			// Default timeout to autohide messages (in milliseconds)
         };
 
     // The actual plugin constructor
@@ -228,13 +230,13 @@
         // Set the default Image
         set_default_image: function (path) {
             this._create_image_with_datasrc(path, false, false, true);
-	    var m = path.match(/.*\/(.+?)[\?#]/);
-	    if (m && m.length > 1) {
-	        this._filename = m[1];
-	    } else {
-	        this._filename = path;
-	    }
-	    this.options.fileNameChanged(this._filename);            
+            var m = path.match(/.*\/(.+?)[\?#]/);
+            if (m && m.length > 1) {
+                this._filename = m[1];
+            } else {
+                this._filename = path;
+            }
+            this.options.fileNameChanged(this._filename);
         },
 		// Remove all notification copy and hide message box
 		hide_messagebox: function () {
@@ -251,16 +253,20 @@
 		},
 		// Open message box alert with defined text autohide after number of milliseconds, display loading spinner
 		set_messagebox: function (text, autohide, closebutton) {
-			autohide = typeof autohide !== 'undefined' ? autohide : 3000;
+			autohide = typeof autohide !== 'undefined' ? autohide : this.options.defaultMessageTimeout;
 			closebutton = typeof closebutton !== 'undefined' ? closebutton : true;
-			var classes = "active";
-			if(!closebutton) classes += " no_close_button";
+			this._messagebox.addClass("active");
+			if(closebutton) {
+				this._messagebox.removeClass("no_close_button");
+			} else {
+				this._messagebox.addClass("no_close_button");
+			}
 			if(autohide) {
 				clearTimeout(this._messagetimeout);
 				var _this = this;
 				this._messagetimeout = setTimeout(function(){ _this.hide_messagebox(); }, autohide);
 			}
-			return this._messagebox.addClass(classes).children("div").html(text);
+			return this._messagebox.children("div").html(text);
 		},
 		// Toggle button and update variables
 		toggle_button: function (elem) {
@@ -446,6 +452,7 @@
 				_this.options.imageUpdated(_this._image);
 				_this._mainbuttons.removeClass("active");
 				if(callback && typeof(callback) == "function") callback();
+				img.onload=null;
 			};
 		},
 		// Functions to controll cropping functionality (drag & resize cropping box)
