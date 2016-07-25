@@ -619,6 +619,7 @@
 			ctx.rotate(rads);
 			ctx.drawImage(this._image, -this._image.width / 2, -this._image.height / 2);
 			this._image.src = canvas.toDataURL("image/png");
+			this._resizeViewport();
 			this._paintCanvas();
 			this.options.imageUpdated(this._image);
 		},
