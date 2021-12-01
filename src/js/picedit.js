@@ -374,7 +374,9 @@
 				},
 				function(stream) {
 					var videoElement = _this._videobox.find("video")[0];
-					videoElement.src = URL.createObjectURL(stream);
+					//videoElement.src = URL.createObjectURL(stream);
+					videoElement.srcObject = stream;
+					videoElement.play();
 					//resize viewport
 					videoElement.onloadedmetadata = function() {
 						if(videoElement.videoWidth && videoElement.videoHeight) {
